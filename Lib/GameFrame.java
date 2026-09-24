@@ -13,5 +13,6 @@ public class GameFrame extends JFrame {
         pack();
         setLocationRelativeTo(null);
     }
+    
 }
 
