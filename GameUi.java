@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import Lib.GameFrame;
+
 import java.awt.*;
 
 public class GameUi extends JPanel{
@@ -18,10 +21,12 @@ public class GameUi extends JPanel{
         l2.setForeground(Color.GREEN);
         
         
-        
-
         JButton b = new JButton("PLAY");
         b.setBounds(125, 400, 150, 50);
+        b.addActionListener(e -> {
+        new GameFrame().setVisible(true);
+        SwingUtilities.getWindowAncestor(this).dispose();
+    });
         add(b); add(l1); add(l2);
     }
 
