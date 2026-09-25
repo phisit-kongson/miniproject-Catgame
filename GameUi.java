@@ -1,12 +1,17 @@
 import javax.swing.*;
+import Lib.GameFrame;
 import java.awt.*;
 
 public class GameUi extends JPanel{
-
+    
     Image bg1 = new ImageIcon(getClass().getResource("pic/catback.jpg")).getImage();
     Image bg2 = new ImageIcon(getClass().getResource("pic/catcenter.png")).getImage();
     Image bg3 = new ImageIcon(getClass().getResource("pic/caticon.jpg")).getImage();
-    public GameUi() {
+    Image bg4 = new ImageIcon(getClass().getResource("pic/ya.png")).getImage();
+    Image bg5 = new ImageIcon(getClass().getResource("pic/mek.png")).getImage();
+    Image bg6 = new ImageIcon(getClass().getResource("pic/mek.png")).getImage();
+
+    GameUi() {
         setPreferredSize(new Dimension(400, 600));
         setLayout(null);
 
@@ -21,6 +26,7 @@ public class GameUi extends JPanel{
         
         
         JButton b = new JButton("PLAY");
+        //JButton b = new JButton(new ImageIcon(getClass().getResource("pic/play.jpg")));
         b.setBounds(85, 490, 220, 50);
         b.setFont(new Font("Comic Sans MS", Font.BOLD, 45));
         b.setForeground(Color.black);
@@ -39,7 +45,9 @@ public class GameUi extends JPanel{
         super.paintComponent(g);
         g.drawImage(bg1, 0, 0, getWidth(), getHeight(), this);
         g.drawImage(bg2, 75, 15, 250, 250, this);
-  
+        g.drawImage(bg4, 0, 430, 450, 250, this);
+        g.drawImage(bg5, 0, 20, 100, 100, this);
+        g.drawImage(bg6, 300, 20, 100, 100, this);
     }
 
     public static void main(String[] args) {
@@ -56,4 +64,5 @@ public class GameUi extends JPanel{
         Image t = new ImageIcon(GameUi.class.getResource("pic/caticon.jpg")).getImage();
         f.setIconImage(t);
     }
+    
 }   
