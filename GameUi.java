@@ -1,5 +1,4 @@
 import javax.swing.*;
-import Lib.GameFrame;
 import java.awt.*;
 
 public class GameUi extends JPanel{
