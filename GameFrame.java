@@ -58,20 +58,46 @@ public class GameFrame extends JFrame implements ActionListener{
         shopbtn.addActionListener(this);
         cp.add(shopbtn);
 
-        feedbtn = new JButton("");
+        ImageIcon feedIcon = null;
+        Image imgfeed = new ImageIcon(getClass().getResource("/pic/feed.png")).getImage();
+        Image feedImg = imgfeed.getScaledInstance(65, 65, Image.SCALE_SMOOTH);
+        feedIcon = new ImageIcon(feedImg);
+        feedbtn = new JButton();
+        feedbtn.setIcon(feedIcon);
         feedbtn.setBounds(120, 500, wbtn, hbtn);
+        feedbtn.setFocusable(false);
         feedbtn.addActionListener(this);
         cp.add(feedbtn);
 
-        sleepbtn = new JButton("");
+        ImageIcon sleepIcon = null;
+        Image imgsleep = new ImageIcon(getClass().getResource("/pic/moons.png")).getImage();
+        Image sleepImg = imgsleep.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        sleepIcon = new ImageIcon(sleepImg);
+        sleepbtn = new JButton();
+        sleepbtn.setIcon(sleepIcon);
         sleepbtn.setBounds(220, 500, wbtn, hbtn);
         sleepbtn.addActionListener(this);
         cp.add(sleepbtn);
 
-        toiletbtn = new JButton("");
+        ImageIcon toiletIcon = null;
+        Image imgtoilet = new ImageIcon(getClass().getResource("/pic/toilet.png")).getImage();
+        Image toiletImg = imgtoilet.getScaledInstance(65, 65, Image.SCALE_SMOOTH);
+        toiletIcon = new ImageIcon(toiletImg);
+        toiletbtn = new JButton();
+        toiletbtn.setIcon(toiletIcon);
         toiletbtn.setBounds(320, 500, wbtn, hbtn);
         toiletbtn.addActionListener(this);
         cp.add(toiletbtn);
+
+        ImageIcon lobbyIcon = null;
+        Image imglobby = new ImageIcon(getClass().getResource("/pic/home.png")).getImage();
+        Image lobbyImg = imglobby.getScaledInstance(66, 65, Image.SCALE_SMOOTH);
+        lobbyIcon = new ImageIcon(lobbyImg);
+        lobbybtn = new JButton();
+        lobbybtn.setIcon(lobbyIcon);
+        lobbybtn.setBounds(320, 5, wbtn, hbtn);
+        lobbybtn.addActionListener(this);
+        cp.add(lobbybtn);
         
     }
 
