@@ -22,7 +22,7 @@ public class GameFrame extends JFrame implements ActionListener{
     public void Initial(){
        
         try {
-            background = new ImageIcon(getClass().getResource("/pic/room2.png")).getImage();
+            background = new ImageIcon(getClass().getResource("/pic/room.png")).getImage();
         } catch (Exception e) {
             background = null;
         }
