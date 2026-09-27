@@ -126,14 +126,28 @@ public class GameFrame extends JFrame implements ActionListener{
         setLocationRelativeTo(null);
     }
 
-    @Override
+     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == shopbtn) {
-            
             Shop shopWindow = new Shop(this);
             shopWindow.setVisible(true);
             this.setVisible(false);
             
-    }
+        }else if (e.getSource() == feedbtn) {
+            Feed feedroom = new Feed(this);
+            feedroom.setVisible(true);
+            this.setVisible(false);
+
+        }else if (e.getSource() == sleepbtn) {
+            Sleep bedroom = new Sleep(this);
+            bedroom.setVisible(true);
+            this.setVisible(false);
+
+
+        }else if (e.getSource() == toiletbtn) {
+            Toilet toiletroom = new Toilet(this);
+            toiletroom.setVisible(true);
+            this.setVisible(false);
+        }
     }
 }
