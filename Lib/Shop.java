@@ -28,7 +28,7 @@ public class Shop extends JFrame implements ActionListener {
         titleLabel.setBounds(50, 30, 300, 40);
         cp.add(titleLabel);
 
-        backBtn = new JButton("return");
+        backBtn = new JButton("back");
         backBtn.setBounds(130, 500, 140, 40);
         backBtn.addActionListener(this);
         cp.add(backBtn);
