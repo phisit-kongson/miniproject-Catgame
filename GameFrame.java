@@ -131,7 +131,7 @@ public class GameFrame extends JFrame implements ActionListener{
         catFrames = new ImageIcon[frameCount];
         for (int i = 0; i < frameCount; i++) {
             Image img = new ImageIcon(getClass().getResource("/pic/cat" + (i + 1) + ".png")).getImage();
-            // ใช้ SCALE_REPLICATE เพื่อให้ pixel art คมชัด ไม่เบลอ
+            
             Image scaled = img.getScaledInstance(catSize, catSize, Image.SCALE_REPLICATE);
             catFrames[i] = new ImageIcon(scaled);
         }
