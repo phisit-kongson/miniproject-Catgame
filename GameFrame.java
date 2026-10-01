@@ -11,6 +11,12 @@ public class GameFrame extends JFrame implements ActionListener{
     private int coin = 10; 
     private JLabel coinBox;
 
+    // ---- แมวอนิเมชัน ----
+    private JLabel catLabel;
+    private ImageIcon[] catFrames;
+    private int catIndex = 0;
+    private javax.swing.Timer catTimer;
+
     public GameFrame() {
         
         Initial();
@@ -22,7 +28,7 @@ public class GameFrame extends JFrame implements ActionListener{
     public void Initial(){
        
         try {
-            background = new ImageIcon(getClass().getResource("/pic/room2.png")).getImage();
+            background = new ImageIcon(getClass().getResource("/pic/room_morning.png")).getImage();
         } catch (Exception e) {
             background = null;
         }
@@ -113,7 +119,36 @@ public class GameFrame extends JFrame implements ActionListener{
         coinBox.setForeground(Color.BLACK);                     
         coinBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3)); 
         cp.add(coinBox);
+
+        setCat();
         
+    }
+
+    
+    public void setCat(){
+        int catSize = 192;
+        int frameCount = 6;
+        catFrames = new ImageIcon[frameCount];
+        for (int i = 0; i < frameCount; i++) {
+            Image img = new ImageIcon(getClass().getResource("/pic/cat" + (i + 1) + ".png")).getImage();
+            // ใช้ SCALE_REPLICATE เพื่อให้ pixel art คมชัด ไม่เบลอ
+            Image scaled = img.getScaledInstance(catSize, catSize, Image.SCALE_REPLICATE);
+            catFrames[i] = new ImageIcon(scaled);
+        }
+
+        catLabel = new JLabel(catFrames[0]);
+        
+        catLabel.setBounds((400 - catSize) / 2, (600 - catSize) / 2, catSize, catSize);
+        cp.add(catLabel);
+
+        catTimer = new javax.swing.Timer(150, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                catIndex = (catIndex + 1) % catFrames.length;
+                catLabel.setIcon(catFrames[catIndex]);
+            }
+        });
+        catTimer.start();
     }
 
     public void Finally(){
@@ -151,4 +186,3 @@ public class GameFrame extends JFrame implements ActionListener{
         }
     }
 }
-
