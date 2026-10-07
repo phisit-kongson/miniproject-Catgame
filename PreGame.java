@@ -15,11 +15,11 @@ public class PreGame extends JPanel {
         title1 = new JLabel("My Little");
         title1.setFont(new Font("Comic Sans MS", Font.BOLD, 50));
         title1.setBounds(100, 200, 400, 100);
-        title1.setForeground(Color.GREEN);
+        title1.setForeground(Color.BLACK);
         title2 = new JLabel("Cat");
         title2.setFont(new Font("Comic Sans MS", Font.BOLD, 50));
         title2.setBounds(160, 275, 400, 100);
-        title2.setForeground(Color.GREEN);
+        title2.setForeground(Color.BLACK);
         
         signupBtn = new JButton("SIGN UP");
         signupBtn.setBounds(85, 490, 220, 50);
@@ -28,7 +28,7 @@ public class PreGame extends JPanel {
         signupBtn.setForeground(Color.black);
         signupBtn.addActionListener(e -> {
         JFrame preFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        new LoginFrame(preFrame);
+        new SignupFrame(preFrame);
         if (preFrame != null) {
         preFrame.setVisible(false);
         }
@@ -38,6 +38,7 @@ public class PreGame extends JPanel {
         loginBtn.setBounds(85, 400, 220, 50);
         loginBtn.setFocusable(false);
         loginBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 40));
+        loginBtn.setForeground(Color.black);
         loginBtn.addActionListener(e -> {
         JFrame preFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         new LoginFrame(preFrame);
