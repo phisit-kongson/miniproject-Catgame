@@ -12,6 +12,9 @@ public class PreGame extends JPanel {
         setPreferredSize(new Dimension(400, 600));
         setLayout(null);
 
+        logo = new ImageIcon(getClass().getResource("/pic/background/catcenter.png")).getImage();
+        preBackground = new ImageIcon(getClass().getResource("/pic/background/login_bg1.png")).getImage();
+
         title1 = new JLabel("My Little");
         title1.setFont(new Font("Comic Sans MS", Font.BOLD, 50));
         title1.setBounds(100, 200, 400, 100);
@@ -21,10 +24,10 @@ public class PreGame extends JPanel {
         title2.setBounds(160, 275, 400, 100);
         title2.setForeground(Color.BLACK);
         
-        signupBtn = new JButton("SIGN UP");
+        signupBtn = new JButton("Sign up");
         signupBtn.setBounds(85, 490, 220, 50);
         signupBtn.setFocusable(false);
-        signupBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 40));
+        signupBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 35));
         signupBtn.setForeground(Color.black);
         signupBtn.addActionListener(e -> {
         JFrame preFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -34,10 +37,10 @@ public class PreGame extends JPanel {
         }
         });
         
-        loginBtn = new JButton("LOG IN");
+        loginBtn = new JButton("Login");
         loginBtn.setBounds(85, 400, 220, 50);
         loginBtn.setFocusable(false);
-        loginBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 40));
+        loginBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 35));
         loginBtn.setForeground(Color.black);
         loginBtn.addActionListener(e -> {
         JFrame preFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -52,8 +55,6 @@ public class PreGame extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        logo = new ImageIcon(getClass().getResource("/pic/background/catcenter.png")).getImage();
-        preBackground = new ImageIcon(getClass().getResource("/pic/background/login_bg1.png")).getImage();
         super.paintComponent(g);
         g.drawImage(preBackground,0,0,getWidth(),getHeight(),this);
         g.drawImage(logo, 75, 15, 250, 250, this);

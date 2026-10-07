@@ -14,7 +14,8 @@ public class LoginFrame extends JFrame implements ActionListener{
     private JPasswordField password ;
     private JButton login1Btn ;
     private JButton backBtn ;
-    private JFrame preFrame;
+    private JFrame preFrame ;
+    private Image background ;
 
     public LoginFrame(JFrame preFrame){
         this.preFrame = preFrame;
@@ -24,7 +25,25 @@ public class LoginFrame extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400,350);
 
-        title = new JLabel("Log In");
+        try {
+            background = new ImageIcon(getClass().getResource("/pic/background/login_bg2.png")).getImage();
+        } catch (Exception e) {
+            background = null;
+        }
+
+        JPanel bgPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (background != null) {
+                    g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
+        bgPanel.setLayout(null);
+        setContentPane(bgPanel);
+
+        title = new JLabel("Login");
         title.setBounds(150,30,100,40);
         title.setFont(new Font("Tahoma", Font.BOLD, 30));
         add(title);
@@ -67,6 +86,8 @@ public class LoginFrame extends JFrame implements ActionListener{
         setVisible(true);
     }
 
+    
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         String usernamein = username.getText();

@@ -30,7 +30,6 @@ public class GameFrame extends JFrame implements ActionListener{
         } catch (Exception e) {
             background = null;
         }
-
         JPanel bgPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -207,13 +206,24 @@ public class GameFrame extends JFrame implements ActionListener{
             bedroom.setVisible(true);
             this.setVisible(false);
 
-
         }else if (e.getSource() == toiletbtn) {
             Toilet toiletroom = new Toilet(this);
             toiletroom.setVisible(true);
             this.setVisible(false);
+
+        }else if (e.getSource() == lobbybtn) {
+            
+            if (decayTimer != null) {
+                decayTimer.stop();
+            }
+            if (cat != null) {
+                cat.stop();
+            }
+            PreGame.main(null);
+            this.dispose();
         }
     }
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new GameFrame();
