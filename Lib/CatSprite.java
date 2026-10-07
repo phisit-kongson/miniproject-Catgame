@@ -7,13 +7,20 @@ public class CatSprite extends JLabel {
 
     private final int size;
     private final ImageIcon[] idleFrames;     
-    private ImageIcon[] happyFrames;          
+    private ImageIcon[] happyFrames;
+    private ImageIcon[] annoyedFrames;         
     private ImageIcon[] currentFrames;
     private final int idleDelay;     
-    private int happyDelay = 150;        
+    private int happyDelay = 150; 
+    private int annoyedDelay = 150;
     private boolean playingOnce = false;
     private int index = 0;
     private final Timer timer;
+
+    private int clickCount = 0;
+    private long firstClickTime = 0;
+    private static final int CLICK_LIMIT = 3;        // คลิกกี่ครั้งถึงจะรำคาญ
+    private static final long CLICK_WINDOW = 4000;   // ภายในกี่ ms
 
     public CatSprite(String prefix, int frameCount, int size, int delayMs) {
         this.size = size;
@@ -39,6 +46,10 @@ public class CatSprite extends JLabel {
     public void setHappyAnimation(String prefix, int frameCount, int delayMs) {
         happyFrames = loadFrames(prefix, frameCount);
         happyDelay = delayMs;
+
+    }public void setAnnoyedAnimation(String prefix, int frameCount, int delayMs) {
+        annoyedFrames = loadFrames(prefix, frameCount);
+        annoyedDelay = delayMs;
     }
 
     private void setSpeed(int ms) {
@@ -47,13 +58,31 @@ public class CatSprite extends JLabel {
     timer.restart();
     }
 
-    public void playHappy() {
-        if (happyFrames == null || playingOnce) return;  
+    public void onClicked() {
+        if (playingOnce) return;   
+        long now = System.currentTimeMillis();
+        if (clickCount == 0 || now - firstClickTime > CLICK_WINDOW) {
+            clickCount = 1;
+            firstClickTime = now;
+        } else {
+            clickCount++;
+        }
+
+        if (clickCount >= CLICK_LIMIT && annoyedFrames != null) {
+            clickCount = 0;
+            playOnce(annoyedFrames, annoyedDelay);
+        } else {
+            playOnce(happyFrames, happyDelay);
+        }
+    }
+
+    private void playOnce(ImageIcon[] frames, int delay) {
+        if (frames == null || playingOnce) return;
         playingOnce = true;
-        currentFrames = happyFrames;
+        currentFrames = frames;
         index = 0;
-        setIcon(currentFrames[0]);   
-        setSpeed(happyDelay);           
+        setIcon(currentFrames[0]);
+        setSpeed(delay);
     }
 
     private void nextFrame() {

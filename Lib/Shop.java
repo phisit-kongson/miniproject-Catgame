@@ -26,6 +26,7 @@ public class Shop extends JFrame implements ActionListener {
         
 
         JLabel titleLabel = new JLabel("Cat Shop", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Tahoma",Font.BOLD,20));
         titleLabel.setBounds(50, 30, 300, 40);
         cp.add(titleLabel);
 
