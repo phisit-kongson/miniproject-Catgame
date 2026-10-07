@@ -153,12 +153,13 @@ public class GameFrame extends JFrame implements ActionListener{
         add(hygieneBar);
 
         cat = new CatSprite("cat", 6, 192, 200);
-        cat.setHappyAnimation("cat-happy", 3, 375); 
+        cat.setHappyAnimation("cat-happy", 3, 375);
+        cat.setAnnoyedAnimation("cat-annoy", 4, 400);
         cat.setLocation((400 - 192) / 2, (600 - 192) / 2);
         cat.addMouseListener(new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
-        cat.playHappy();             
+        cat.onClicked();             
         }
         });
 
