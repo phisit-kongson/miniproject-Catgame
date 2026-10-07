@@ -14,15 +14,16 @@ public class Shop extends JFrame implements ActionListener {
         this.parentFrame = parentFrame;
 
         setTitle("Cat Shop");
-        setSize(400, 600);
         setResizable(false);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         
         cp = getContentPane();
         cp.setLayout(null);
-        cp.setBackground(Color.GRAY);
+        cp.setPreferredSize(new Dimension(400, 600));
+        pack();
+        setLocationRelativeTo(null);
+        
 
         JLabel titleLabel = new JLabel("Cat Shop", SwingConstants.CENTER);
         titleLabel.setBounds(50, 30, 300, 40);
@@ -30,8 +31,10 @@ public class Shop extends JFrame implements ActionListener {
 
         backBtn = new JButton("back");
         backBtn.setBounds(130, 500, 140, 40);
+        backBtn.setFocusable(false);
         backBtn.addActionListener(this);
         cp.add(backBtn);
+        
     }
 
     @Override

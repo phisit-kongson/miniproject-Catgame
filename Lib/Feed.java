@@ -34,7 +34,7 @@ public class Feed extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backBtn) {
             if (parentFrame != null) {
-                parentFrame.setVisible(true); // เปิดหน้า GameFrame กลับมา
+                parentFrame.setVisible(true); 
             }
             this.dispose();
         }
