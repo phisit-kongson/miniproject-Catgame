@@ -6,14 +6,22 @@ import java.awt.*;
 public class CatSprite extends JLabel {
 
     private final int size;
-    private final ImageIcon[] idleFrames;     
-    private ImageIcon[] happyFrames;
-    private ImageIcon[] annoyedFrames;         
-    private ImageIcon[] currentFrames;
+    private final ImageIcon[] idleFrames;     // ยืน
+    private ImageIcon[] happyFrames;           // มีความสุข
+    private ImageIcon[] annoyedFrames;          // โกรธ
+    private ImageIcon[] bathFrames;             // ถูสบู่
+    private ImageIcon[] rinseFrames;            // ล้างตัว
+    private ImageIcon[] currentFrames;          
+    private ImageIcon[] sleepFrames;            // นอน
     private final int idleDelay;     
     private int happyDelay = 150; 
     private int annoyedDelay = 150;
-    private boolean playingOnce = false;
+    private int rinseDelay = 350;
+    private int sleepDelay = 600;
+    private boolean playingOnce = false;    // กดเล่นเเมว
+    private boolean holding = false;      // ค้างเฟรม
+    private boolean sleeping = false;      
+    private Runnable onFinished;          // ทำต่อหลังรันอนิเมชันจบ
     private int index = 0;
     private final Timer timer;
 
@@ -52,6 +60,69 @@ public class CatSprite extends JLabel {
         annoyedDelay = delayMs;
     }
 
+    public void setSleepAnimation(String prefix, int frameCount, int delayMs) {
+        sleepFrames = loadFrames(prefix, frameCount);
+        sleepDelay = delayMs;
+    }
+
+    public boolean isSleeping() {
+        return sleeping;
+    }
+
+    public void sleep() {
+        if (sleepFrames == null || playingOnce || sleeping) return;
+        sleeping = true;
+        currentFrames = sleepFrames;
+        index = 0;
+        setIcon(currentFrames[0]);
+        setSpeed(sleepDelay);
+    }
+
+    public void wake() {
+        if (!sleeping) return;
+        sleeping = false;
+        currentFrames = idleFrames;
+        index = 0;
+        setIcon(currentFrames[0]);
+        setSpeed(idleDelay);
+    }
+    // ---------- อาบน้ำ ----------
+    public void setBathFrames(String prefix, int frameCount) {
+        bathFrames = loadFrames(prefix, frameCount);
+    }
+
+    public void setRinseAnimation(String prefix, int frameCount, int delayMs) {
+        rinseFrames = loadFrames(prefix, frameCount);
+        rinseDelay = delayMs;
+    }
+
+    /** กำลังเล่นอนิเมชันรอบเดียวอยู่หรือไม่ (ระหว่างนี้ไม่ควรรับคลิก) */
+    public boolean isBusy() {
+        return playingOnce;
+    }
+
+    /** โชว์แมวที่มีฟองระดับ level (0 = น้อยสุด) แล้วค้างไว้ */
+    public void showBathLevel(int level) {
+        if (bathFrames == null || playingOnce) return;
+        holding = true;
+        setIcon(bathFrames[Math.max(0, Math.min(level, bathFrames.length - 1))]);
+    }
+
+    /** เล่นอนิเมชันล้างน้ำรอบเดียว (เลิกค้างเฟรมฟองให้เอง) จบแล้วเรียก onDone */
+    public void playRinse(Runnable onDone) {
+        holding = false;
+        if (rinseFrames == null || playingOnce) {
+            if (onDone != null) onDone.run();
+            return;
+        }
+        onFinished = onDone;
+        playOnce(rinseFrames, rinseDelay);
+    }
+
+    public void playHappy() {
+        playOnce(happyFrames, happyDelay);
+    }
+
     private void setSpeed(int ms) {
     timer.setDelay(ms);
     timer.setInitialDelay(ms);
@@ -86,16 +157,21 @@ public class CatSprite extends JLabel {
     }
 
     private void nextFrame() {
+        if (holding) return;                      // ค้างเฟรมฟองสบู่
         index++;
-        if (index >= currentFrames.length) {      
-            if (playingOnce) {                    
+        Runnable done = null;
+        if (index >= currentFrames.length) {
+            if (playingOnce) {
                 playingOnce = false;
                 currentFrames = idleFrames;
                 setSpeed(idleDelay);
+                done = onFinished;
+                onFinished = null;
             }
-            index = 0;                            
+            index = 0;
         }
         setIcon(currentFrames[index]);
+        if (done != null) done.run();             
     }
 
     public void start() { timer.start(); }

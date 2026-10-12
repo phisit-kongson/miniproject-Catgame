@@ -14,6 +14,7 @@ public class SignupFrame extends JFrame implements ActionListener{
     private JButton signupBtn ;
     private JButton backBtn ;
     private JFrame preFrame;
+    private Image background ;
 
     public SignupFrame(JFrame preFrame){
         this.preFrame = preFrame;
@@ -23,7 +24,25 @@ public class SignupFrame extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400,350);
 
-        title = new JLabel("Sign Up");
+        try {
+            background = new ImageIcon(getClass().getResource("/pic/background/login_bg2.png")).getImage();
+        } catch (Exception e) {
+            background = null;
+        }
+
+        JPanel bgPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (background != null) {
+                    g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
+        bgPanel.setLayout(null);
+        setContentPane(bgPanel);
+
+        title = new JLabel("Sign up");
         title.setBounds(150,30,140,40);
         title.setFont(new Font("Tahoma", Font.BOLD, 30));
         add(title);

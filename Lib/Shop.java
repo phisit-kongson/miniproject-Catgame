@@ -10,40 +10,131 @@ public class Shop extends JFrame implements ActionListener {
     private JButton backBtn;
     private JFrame parentFrame; 
     
+    private final GameState state = GameState.get(); // ดึงข้อมูลสถานะกลางของเกม
+    private Image shopBg; // ตัวแปรเก็บรูปภาพพื้นหลังร้านค้า
+
     public Shop(JFrame parentFrame) {
         this.parentFrame = parentFrame;
 
         setTitle("Cat Shop");
         setResizable(false);
-        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
-        cp = getContentPane();
-        cp.setLayout(null);
-        cp.setPreferredSize(new Dimension(400, 600));
-        pack();
-        setLocationRelativeTo(null);
-        
+        // 1. พื้นหลังร้านค้า
+        try {
+            shopBg = new ImageIcon(getClass().getResource("/pic/background/login_bg1.png")).getImage();
+        } catch (Exception e) {
+            shopBg = null;
+        }
 
+        // 2. พื้นหลัง
+        JPanel bgPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (shopBg != null) {
+                    g.drawImage(shopBg, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    g.setColor(new Color(180, 180, 180));
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+        bgPanel.setLayout(null);
+        bgPanel.setPreferredSize(new Dimension(400, 600));
+        setContentPane(bgPanel);
+        cp = bgPanel;
+
+        //   "Cat Shop" 
         JLabel titleLabel = new JLabel("Cat Shop", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Tahoma",Font.BOLD,20));
-        titleLabel.setBounds(50, 30, 300, 40);
+        titleLabel.setFont(new Font("Monospaced", Font.BOLD, 26)); 
+        titleLabel.setBounds(60, 20, 280, 50);
+        titleLabel.setOpaque(true);
+        titleLabel.setBackground(Color.WHITE);
+        titleLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
         cp.add(titleLabel);
 
-        backBtn = new JButton("back");
-        backBtn.setBounds(130, 500, 140, 40);
+        //  รายการสินค้าแต่ละแถว 
+        createItemRow(80, "Fish", "5 Coins", "fish", 5, "/pic/icon/fish.png");
+        createItemRow(190, "Cat Milk", "3 Coins", "milk", 3, "/pic/icon/milk.png");
+        createItemRow(300, "Kibble", "8 Coins", "kibble", 8, "/pic/icon/kibble.png");
+        createItemRow(410, "Snack cat", "5 Coins", "snack cat", 5, "/pic/icon/snackcat.png");
+
+        //  ปุ่มย้อนกลับ (Back)
+        backBtn = new JButton("< Back");
+        backBtn.setFont(new Font("Monospaced", Font.BOLD, 18));
+        backBtn.setBounds(100, 525, 200, 45);
+        backBtn.setBackground(new Color(240, 240, 240));
         backBtn.setFocusable(false);
+        backBtn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
         backBtn.addActionListener(this);
         cp.add(backBtn);
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    // ฟังก์ชันสร้างแถว UI สินค้า ระบบกดซื้อ
+    private void createItemRow(int yPos, String itemName, String priceText, String itemKey, int price, String imagePath) {
+        JPanel rowPanel = new JPanel();
+        rowPanel.setLayout(null);
+        rowPanel.setBounds(30, yPos, 340, 95);
+        rowPanel.setBackground(new Color(255, 255, 255, 235)); // พื้นหลังขาวโปร่งแสงเล็กน้อยเพื่อให้เห็นลายพื้นหลังร้าน
+        rowPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+
+        // ชื่อสินค้า
+        JLabel nameLabel = new JLabel(itemName);
+        nameLabel.setFont(new Font("Monospaced", Font.BOLD, 17));
+        nameLabel.setBounds(75, 10, 150, 25);
+        rowPanel.add(nameLabel);
+
+        // รูปภาพอาหาร
+        JLabel imgLabel = new JLabel("", SwingConstants.CENTER);
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource(imagePath));
+            Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            imgLabel.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            imgLabel.setText("🖼️"); // ไอคอนสำรองกรณีหาไฟล์ภาพไม่เจอ
+        }
+        imgLabel.setBounds(15, 27, 45, 45);
+        rowPanel.add(imgLabel);
+
+        // ราคา
+        JLabel priceLabel = new JLabel(" " + priceText);
+        priceLabel.setFont(new Font("Monospaced", Font.BOLD, 15));
+        priceLabel.setBounds(75, 48, 150, 25);
+        rowPanel.add(priceLabel);
+
+        // ปุ่ม Buy 
+        JButton buyBtn = new JButton("Buy");
+        buyBtn.setFont(new Font("Monospaced", Font.BOLD, 16));
+        buyBtn.setForeground(Color.WHITE);
+        buyBtn.setBackground(new Color(51, 122, 183));
+        buyBtn.setBounds(230, 22, 90, 50);
+        buyBtn.setFocusable(false);
+        buyBtn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
         
+        // เมื่อกดซื้อสินค้า
+        buyBtn.addActionListener(e -> {
+            if (state.trySpend(price)) { // หักเหรียญผ่าน GameState
+                state.addItem(itemKey, 1); // เพิ่มไอเทมเข้ากระเป๋า
+                JOptionPane.showMessageDialog(this, "Successfully bought " + itemName + "!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Not enough coins!", "Warning", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        rowPanel.add(buyBtn);
+        cp.add(rowPanel);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backBtn) {
-           
             if (parentFrame != null) {
-                parentFrame.setVisible(true);
+                parentFrame.setVisible(true); 
             }
             this.dispose();
         }

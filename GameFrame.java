@@ -8,12 +8,8 @@ public class GameFrame extends JFrame implements ActionListener{
     
     private Container cp;
     private JButton shopbtn, feedbtn, sleepbtn, toiletbtn, lobbybtn;
-    private Image background;
-    private int coin ; 
-    private JLabel coinBox;
+    private Image background; 
     private CatSprite cat;
-    private JProgressBar hungerBar, energyBar, hygieneBar;
-    private Timer decayTimer;
     
     public GameFrame() {
         
@@ -30,7 +26,6 @@ public class GameFrame extends JFrame implements ActionListener{
         } catch (Exception e) {
             background = null;
         }
-
         JPanel bgPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -111,72 +106,22 @@ public class GameFrame extends JFrame implements ActionListener{
         lobbybtn.addActionListener(this);
         cp.add(lobbybtn);
 
-        //บล็อคแสดงcoin
-        coin = 100;
-        coinBox = new JLabel("coin : " + coin, SwingConstants.CENTER);
-        coinBox.setFont(new Font("", Font.BOLD, 16));
-        coinBox.setBounds(15, 15, 100, 35); 
-        coinBox.setOpaque(true);                                
-        coinBox.setBackground(Color.WHITE);                     
-        coinBox.setForeground(Color.BLACK);                     
-        coinBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3)); 
-        cp.add(coinBox);
-
-        UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
-        UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
-
-        //หลอดค่าพลังงาน
-        energyBar = new JProgressBar(0, 100);
-        energyBar.setValue(80); //กำหนดค่าเริ่มต้น
-        energyBar.setStringPainted(true); //เเสดงเปอร์เซ็น
-        energyBar.setFont(new Font("Tahoma",Font.CENTER_BASELINE,14));
-        energyBar.setForeground(new Color(36, 149, 255));
-        energyBar.setBounds(20, 65, 100, 15);
-        add(energyBar);
-        
-        //หลอดค่าความหิว
-        hungerBar = new JProgressBar(0, 100); 
-        hungerBar.setValue(50);               
-        hungerBar.setStringPainted(true);     
-        hungerBar.setFont(new Font("Tahoma",Font.CENTER_BASELINE,14));
-        hungerBar.setForeground(new Color(240, 129, 60)); 
-        hungerBar.setBounds(20, 90, 100, 15); 
-        add(hungerBar);
-
-        //หลอดความสะอาด
-        hygieneBar = new JProgressBar(0,100);
-        hygieneBar.setValue(100);
-        hygieneBar.setStringPainted(true);
-        hygieneBar.setFont(new Font("Tahoma",Font.CENTER_BASELINE,14));
-        hygieneBar.setForeground(new Color(51, 222, 205));
-        hygieneBar.setBounds(20,115,100,15);
-        add(hygieneBar);
+        cp.add(new StatusPanel());
 
         cat = new CatSprite("cat", 6, 192, 200);
-        cat.setHappyAnimation("cat-happy", 3, 375); 
+        cat.setHappyAnimation("cat-happy", 3, 375);
+        cat.setAnnoyedAnimation("cat-annoy", 4, 400);
         cat.setLocation((400 - 192) / 2, (600 - 192) / 2);
         cat.addMouseListener(new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
-        cat.playHappy();             
+        cat.onClicked();             
         }
         });
 
         cp.add(cat);
         cat.start();
-        startStatusDecay();
-    }
-
-    public void startStatusDecay() {
-        decayTimer = new Timer(5000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                energyBar.setValue(Math.max(0, energyBar.getValue() - 1));
-                hungerBar.setValue(Math.max(0, hungerBar.getValue() - 2));
-                hygieneBar.setValue(Math.max(0, hygieneBar.getValue() - 1));
-            }
-        });
-        decayTimer.start();
+        GameState.get().startDecay();
     }
 
     public void Finally(){
@@ -206,13 +151,21 @@ public class GameFrame extends JFrame implements ActionListener{
             bedroom.setVisible(true);
             this.setVisible(false);
 
-
         }else if (e.getSource() == toiletbtn) {
             Toilet toiletroom = new Toilet(this);
             toiletroom.setVisible(true);
             this.setVisible(false);
+
+        }else if (e.getSource() == lobbybtn) {
+            GameState.get().stopDecay();
+            if (cat != null) {
+                cat.stop();
+            }
+            PreGame.main(null);
+            this.dispose();
         }
     }
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new GameFrame();
