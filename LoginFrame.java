@@ -25,12 +25,7 @@ public class LoginFrame extends JFrame implements ActionListener{
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400,350);
 
-        try {
-            background = new ImageIcon(getClass().getResource("/pic/background/login_bg2.png")).getImage();
-        } catch (Exception e) {
-            background = null;
-        }
-
+        background = new ImageIcon(getClass().getResource("/pic/background/login_bg2.png")).getImage();
         JPanel bgPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
