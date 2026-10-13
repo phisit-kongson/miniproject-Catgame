@@ -44,19 +44,20 @@ public class Toilet extends JFrame implements ActionListener {
         setContentPane(bgPanel);
         cp = getContentPane();          
 
-        
         backBtn = new JButton("back");
-        backBtn.setBounds(130, 515, 140, 40);
+        backBtn.setFont(new Font("Monospaced", Font.BOLD, 18));
+        backBtn.setBounds(110, 525, 170, 40);
+        backBtn.setBackground(Color.WHITE);
         backBtn.setFocusable(false);
         backBtn.addActionListener(this);
-        cp.add(backBtn);
+        cp.add(backBtn);;
 
         cp.add(new StatusPanel());
         
         // ข้อความ
         hintLabel = new JLabel("Click on the cat to give it a bath.", SwingConstants.CENTER);
         hintLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-        hintLabel.setBounds(60, 462, 280, 32);
+        hintLabel.setBounds(60, 480, 280, 32);
         hintLabel.setOpaque(true);
         hintLabel.setBackground(Color.WHITE);
         hintLabel.setForeground(Color.BLACK);
@@ -106,7 +107,7 @@ public class Toilet extends JFrame implements ActionListener {
                 hintLabel.setText("Click (" + soapLevel + "/" + BATH_LEVELS + ")");
             }
 
-        } else if (bath == Bath.FOAM_FULL) {                // ล้างน้ำ
+        }  else if (bath == Bath.FOAM_FULL) {                // ล้างน้ำ
             bath = Bath.RINSING;
             hintLabel.setText("Rinsing...");
             cat.playRinse(() -> {
@@ -114,7 +115,17 @@ public class Toilet extends JFrame implements ActionListener {
                 cat.playHappy();
                 soapLevel = 0;
                 bath = Bath.IDLE;
-                hintLabel.setText("The kitty is cleaner now!");
+
+                if (state.getHygiene() >= GameState.MAX) {
+                    boolean gotReward = state.tryClaimReward("toilet", 20);
+                    if (gotReward) {
+                        hintLabel.setText("Clean & fresh! +20 Coins ");
+                    } else {
+                        hintLabel.setText("The kitty is cleaner now!");
+                    }
+                } else {
+                    hintLabel.setText("The kitty is cleaner now!");
+                }
             });
         }
     }

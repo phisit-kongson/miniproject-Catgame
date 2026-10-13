@@ -12,6 +12,9 @@ import javax.swing.Timer;
 public class GameState {
 
     private static final GameState INSTANCE = new GameState();
+    private final java.util.HashMap<String, Integer> inventory = new java.util.HashMap<>();
+    private final java.util.HashMap<String, Long> lastRewardTimes = new java.util.HashMap<>();
+    private static final long COOLDOWN_MS = 30000; // 30 วินาที 
 
     public static GameState get() {
         return INSTANCE;
@@ -56,12 +59,34 @@ public class GameState {
         return true;
     }
 
+    // เมธอดเพิ่มไอเทมเข้ากระเป๋า
+    public void addItem(String itemKey, int amount) {
+        int current = inventory.getOrDefault(itemKey, 0);
+        inventory.put(itemKey, current + amount);
+        fireChanged();
+    }
+    public int getItemCount(String itemKey) {
+        return inventory.getOrDefault(itemKey, 0);
+    }
+
+    public boolean useItem(String itemKey) {
+        int current = getItemCount(itemKey);
+        if (current <= 0) return false;      // ไม่มีของ
+        inventory.put(itemKey, current - 1);
+        fireChanged();
+    return true;
+    }
+
     // กลับเป็นค่าเริ่มต้น 
     public void reset() {
         coin = 100;
         energy = 0;
         hunger = 80;
         hygiene = 0;
+        inventory.put("fish", 0);
+        inventory.put("milk", 0);
+        inventory.put("kibble", 0);
+        inventory.put("snack cat", 0);
         fireChanged();
     }
 
@@ -89,5 +114,28 @@ public class GameState {
 
     private static int clamp(int v) {
         return Math.max(0, Math.min(MAX, v));
+    }
+    public boolean tryClaimReward(String activityKey, int rewardCoin) {
+        long now = System.currentTimeMillis();
+        long lastTime = lastRewardTimes.getOrDefault(activityKey, 0L);
+
+        // ถ้าเวลาปัจจุบันห่างจากรอบก่อนเกิน 30 วินาที
+        if (now - lastTime >= COOLDOWN_MS) {
+            addCoin(rewardCoin);                  // บวกเหรียญและอัปเดตหน้าจออัตโนมัติ
+            lastRewardTimes.put(activityKey, now); // บันทึกเวลาที่ได้รับล่าสุด
+            return true;
+        }
+        return false; // ยังติด Cooldown ไม่แจกเหรียญ
+    }
+
+    /**
+     * คำนวณเวลา Cooldown ที่เหลือ (วินาที) ไว้แจ้งเตือนผู้เล่น
+     */
+    public long getRemainingCooldown(String activityKey) {
+        long now = System.currentTimeMillis();
+        long lastTime = lastRewardTimes.getOrDefault(activityKey, 0L);
+        long diff = now - lastTime;
+        if (diff >= COOLDOWN_MS) return 0;
+        return (COOLDOWN_MS - diff) / 1000;
     }
 }

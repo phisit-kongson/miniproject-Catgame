@@ -13,11 +13,15 @@ public class CatSprite extends JLabel {
     private ImageIcon[] rinseFrames;            // ล้างตัว
     private ImageIcon[] currentFrames;          
     private ImageIcon[] sleepFrames;            // นอน
+    private ImageIcon[] eatFrames;
+    private ImageIcon[] vomitFrames;            //อ้วก              
     private final int idleDelay;     
     private int happyDelay = 150; 
     private int annoyedDelay = 150;
     private int rinseDelay = 350;
     private int sleepDelay = 600;
+    private int eatDelay = 400;
+    private int vomitDelay = 450;
     private boolean playingOnce = false;    // กดเล่นเเมว
     private boolean holding = false;      // ค้างเฟรม
     private boolean sleeping = false;      
@@ -117,6 +121,33 @@ public class CatSprite extends JLabel {
         }
         onFinished = onDone;
         playOnce(rinseFrames, rinseDelay);
+    }
+
+    public void setEatAnimation(String prefix, int frameCount, int delayMs) {
+        eatFrames = loadFrames(prefix, frameCount);
+        eatDelay = delayMs;
+    }
+
+    public void playEat(Runnable onDone) {
+        if (eatFrames == null || playingOnce) {
+            if (onDone != null) onDone.run();
+            return;
+        }
+        onFinished = onDone;
+        playOnce(eatFrames, eatDelay);
+    }
+    public void setVomitAnimation(String prefix, int frameCount, int delayMs) {
+        vomitFrames = loadFrames(prefix, frameCount);
+        vomitDelay = delayMs;
+    }
+
+    public void playVomit(Runnable onDone) {
+        if (vomitFrames == null || playingOnce) {
+            if (onDone != null) onDone.run();
+            return;
+        }
+        onFinished = onDone;
+        playOnce(vomitFrames, vomitDelay);
     }
 
     public void playHappy() {

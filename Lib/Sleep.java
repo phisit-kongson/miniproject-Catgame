@@ -11,6 +11,7 @@ public class Sleep extends JFrame implements ActionListener {
     private JFrame parentFrame;
     private CatSprite cat;
     private Image bedroom;
+    private JLabel hintLabel;
 
     private final GameState state = GameState.get();   
     private Timer energyTimer;                         
@@ -38,12 +39,23 @@ public class Sleep extends JFrame implements ActionListener {
         cp = getContentPane();
 
         backBtn = new JButton("back");
-        backBtn.setBounds(130, 515, 140, 40);
+        backBtn.setFont(new Font("Monospaced", Font.BOLD, 18));
+        backBtn.setBounds(110, 525, 170, 40);
+        backBtn.setBackground(Color.WHITE);
         backBtn.setFocusable(false);
         backBtn.addActionListener(this);
         cp.add(backBtn);
 
-        cp.add(new StatusPanel());  
+        cp.add(new StatusPanel());
+
+        hintLabel = new JLabel("Click on the cat to sleep.", SwingConstants.CENTER);
+        hintLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        hintLabel.setBounds(60, 480, 280, 32);
+        hintLabel.setOpaque(true);
+        hintLabel.setBackground(Color.WHITE);
+        hintLabel.setForeground(Color.BLACK);
+        hintLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+        cp.add(hintLabel);
 
         cat = new CatSprite("cat", 6, 192, 200);
         cat.setLocation(104, 240);
@@ -51,8 +63,14 @@ public class Sleep extends JFrame implements ActionListener {
         cat.setSleepAnimation("cat-sleep", 4, 600);       
         energyTimer = new Timer(500, e -> {           
             state.addEnergy(3);
-            if (state.getEnergy() >= GameState.MAX) {  //เต็มแล้วแมวตื่นเอง
+            if (state.getEnergy() >= GameState.MAX) {  
                 wakeCat();
+                boolean gotMoney = state.tryClaimReward("sleep", 20);
+                if (gotMoney) {
+                   hintLabel.setText("The cat is awake! +20 coin");
+                }else {
+                    hintLabel.setText("The cat is awake!");
+                }
             }
         });
 
@@ -79,6 +97,7 @@ public class Sleep extends JFrame implements ActionListener {
     private void sleepCat() {                          
         cat.sleep();
         cat.setLocation(104, 240 + 40);
+        hintLabel.setText("The cat is sleeping.");
         energyTimer.start();
     }
 
@@ -86,6 +105,7 @@ public class Sleep extends JFrame implements ActionListener {
         energyTimer.stop();
         cat.wake();
         cat.setLocation(104, 240);
+        hintLabel.setText("The cat is awake!");
     }
 
     @Override
