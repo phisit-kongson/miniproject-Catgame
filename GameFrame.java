@@ -55,6 +55,7 @@ public class GameFrame extends JFrame implements ActionListener{
         shopbtn.setIcon(shopIcon);
         shopbtn.setBounds(20, 500, wbtn, hbtn);
         shopbtn.setFocusable(false);
+        shopbtn.setBackground(Color.WHITE);
         shopbtn.addActionListener(this);
         cp.add(shopbtn);
 
@@ -67,6 +68,7 @@ public class GameFrame extends JFrame implements ActionListener{
         feedbtn.setIcon(feedIcon);
         feedbtn.setBounds(120, 500, wbtn, hbtn);
         feedbtn.setFocusable(false);
+        feedbtn.setBackground(Color.WHITE);
         feedbtn.addActionListener(this);
         cp.add(feedbtn);
 
@@ -79,6 +81,7 @@ public class GameFrame extends JFrame implements ActionListener{
         sleepbtn.setIcon(sleepIcon);
         sleepbtn.setBounds(220, 500, wbtn, hbtn);
         sleepbtn.setFocusable(false);
+        sleepbtn.setBackground(Color.WHITE);
         sleepbtn.addActionListener(this);
         cp.add(sleepbtn);
 
@@ -91,6 +94,7 @@ public class GameFrame extends JFrame implements ActionListener{
         toiletbtn.setIcon(toiletIcon);
         toiletbtn.setBounds(320, 500, wbtn, hbtn);
         toiletbtn.setFocusable(false);
+        toiletbtn.setBackground(Color.WHITE);
         toiletbtn.addActionListener(this);
         cp.add(toiletbtn);
 
@@ -103,19 +107,24 @@ public class GameFrame extends JFrame implements ActionListener{
         lobbybtn.setIcon(lobbyIcon);
         lobbybtn.setBounds(320, 5, wbtn, hbtn);
         lobbybtn.setFocusable(false);
+        lobbybtn.setBackground(Color.WHITE);
         lobbybtn.addActionListener(this);
         cp.add(lobbybtn);
 
         cp.add(new StatusPanel());
 
         cat = new CatSprite("cat", 6, 192, 200);
-        cat.setHappyAnimation("cat-happy", 3, 375);
+        cat.setHappyAnimation("cat-happy", 3, 425);
         cat.setAnnoyedAnimation("cat-annoy", 4, 400);
         cat.setLocation((400 - 192) / 2, (600 - 192) / 2);
         cat.addMouseListener(new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
-        cat.onClicked();             
+            cat.onClicked();
+            boolean gotMoney = GameState.get().tryClaimReward("pet", 15);
+            if(gotMoney){
+
+            }  
         }
         });
 
