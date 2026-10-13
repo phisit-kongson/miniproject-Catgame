@@ -67,7 +67,7 @@ public class Sleep extends JFrame implements ActionListener {
                 wakeCat();
                 boolean gotMoney = state.tryClaimReward("sleep", 20);
                 if (gotMoney) {
-                   hintLabel.setText("The cat is awake! +20 coin");
+                   hintLabel.setText("The cat is awake! +20 coin (cd 30s)");
                 }else {
                     hintLabel.setText("The cat is awake!");
                 }

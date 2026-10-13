@@ -32,8 +32,8 @@ public class GameState {
 
     private GameState() {
         reset();
-        // ลดทุก 5 วิ
-        decayTimer = new Timer(5000, e -> {
+        // ลดทุก 6 วิ
+        decayTimer = new Timer(6000, e -> {
             energy  = clamp(energy  - 2);
             hunger  = clamp(hunger  - 3);
             hygiene = clamp(hygiene - 2);
@@ -51,7 +51,6 @@ public class GameState {
     public void addHunger(int n)  { hunger  = clamp(hunger  + n);    fireChanged(); }
     public void addHygiene(int n) { hygiene = clamp(hygiene + n);    fireChanged(); }
 
-    // จ่ายเหรียญ ถ้าเหรียญไม่พอจะไม่หักและคืน false 
     public boolean trySpend(int cost) {
         if (cost > coin) return false;
         coin -= cost;
@@ -59,7 +58,6 @@ public class GameState {
         return true;
     }
 
-    // เมธอดเพิ่มไอเทมเข้ากระเป๋า
     public void addItem(String itemKey, int amount) {
         int current = inventory.getOrDefault(itemKey, 0);
         inventory.put(itemKey, current + amount);
@@ -71,7 +69,7 @@ public class GameState {
 
     public boolean useItem(String itemKey) {
         int current = getItemCount(itemKey);
-        if (current <= 0) return false;      // ไม่มีของ
+        if (current <= 0) return false;      
         inventory.put(itemKey, current - 1);
         fireChanged();
     return true;
@@ -79,10 +77,10 @@ public class GameState {
 
     // กลับเป็นค่าเริ่มต้น 
     public void reset() {
-        coin = 100;
-        energy = 0;
-        hunger = 80;
-        hygiene = 0;
+        coin = 50;
+        energy = 60;
+        hunger = 60;
+        hygiene = 50;
         inventory.put("fish", 0);
         inventory.put("milk", 0);
         inventory.put("kibble", 0);
@@ -90,7 +88,7 @@ public class GameState {
         fireChanged();
     }
 
-    // ตัวลดค่าอัตโนมัติ 
+    
     public void startDecay() {
         if (!decayTimer.isRunning()) decayTimer.start();
     }
@@ -99,7 +97,6 @@ public class GameState {
         decayTimer.stop();
     }
 
-    // ตัวฟังการเปลี่ยนแปลง  StatusPanel ใช้
     public void addListener(Runnable r) {
         if (!listeners.contains(r)) listeners.add(r);
     }

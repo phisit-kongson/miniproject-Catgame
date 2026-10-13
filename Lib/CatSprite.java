@@ -11,17 +11,19 @@ public class CatSprite extends JLabel {
     private ImageIcon[] annoyedFrames;          // โกรธ
     private ImageIcon[] bathFrames;             // ถูสบู่
     private ImageIcon[] rinseFrames;            // ล้างตัว
+    private ImageIcon[] waterFrames;            // ท่ารำคาญน้ำ 
     private ImageIcon[] currentFrames;          
     private ImageIcon[] sleepFrames;            // นอน
     private ImageIcon[] eatFrames;
     private ImageIcon[] vomitFrames;            //อ้วก              
     private final int idleDelay;     
-    private int happyDelay = 150; 
-    private int annoyedDelay = 150;
-    private int rinseDelay = 350;
-    private int sleepDelay = 600;
-    private int eatDelay = 400;
-    private int vomitDelay = 450;
+    private int happyDelay ; 
+    private int annoyedDelay ;
+    private int rinseDelay ;
+    private int waterDelay ;
+    private int sleepDelay ;
+    private int eatDelay ;
+    private int vomitDelay ;
     private boolean playingOnce = false;    // กดเล่นเเมว
     private boolean holding = false;      // ค้างเฟรม
     private boolean sleeping = false;      
@@ -64,6 +66,7 @@ public class CatSprite extends JLabel {
         annoyedDelay = delayMs;
     }
 
+    // ห้องนอน
     public void setSleepAnimation(String prefix, int frameCount, int delayMs) {
         sleepFrames = loadFrames(prefix, frameCount);
         sleepDelay = delayMs;
@@ -90,7 +93,7 @@ public class CatSprite extends JLabel {
         setIcon(currentFrames[0]);
         setSpeed(idleDelay);
     }
-    // ---------- อาบน้ำ ----------
+    // ในห้องน้ำ
     public void setBathFrames(String prefix, int frameCount) {
         bathFrames = loadFrames(prefix, frameCount);
     }
@@ -100,19 +103,18 @@ public class CatSprite extends JLabel {
         rinseDelay = delayMs;
     }
 
-    /** กำลังเล่นอนิเมชันรอบเดียวอยู่หรือไม่ (ระหว่างนี้ไม่ควรรับคลิก) */
+    // อนิเมชันรอบเดียวไม่รับคลิกเพิ่ม
     public boolean isBusy() {
         return playingOnce;
     }
 
-    /** โชว์แมวที่มีฟองระดับ level (0 = น้อยสุด) แล้วค้างไว้ */
+    // ค้างเฟรมท่าฟอง
     public void showBathLevel(int level) {
         if (bathFrames == null || playingOnce) return;
         holding = true;
         setIcon(bathFrames[Math.max(0, Math.min(level, bathFrames.length - 1))]);
     }
 
-    /** เล่นอนิเมชันล้างน้ำรอบเดียว (เลิกค้างเฟรมฟองให้เอง) จบแล้วเรียก onDone */
     public void playRinse(Runnable onDone) {
         holding = false;
         if (rinseFrames == null || playingOnce) {
@@ -123,6 +125,17 @@ public class CatSprite extends JLabel {
         playOnce(rinseFrames, rinseDelay);
     }
 
+    public void setWaterAnimation(String prefix, int frameCount, int delayMs) {
+        waterFrames = loadFrames(prefix, frameCount);
+        waterDelay = delayMs;
+    }
+
+    
+    public void playWaterAnnoyed() {
+        playOnce(waterFrames, waterDelay);
+    }
+
+    // ให้อาหาร
     public void setEatAnimation(String prefix, int frameCount, int delayMs) {
         eatFrames = loadFrames(prefix, frameCount);
         eatDelay = delayMs;
@@ -188,7 +201,7 @@ public class CatSprite extends JLabel {
     }
 
     private void nextFrame() {
-        if (holding) return;                      // ค้างเฟรมฟองสบู่
+        if (holding) return;                      
         index++;
         Runnable done = null;
         if (index >= currentFrames.length) {
