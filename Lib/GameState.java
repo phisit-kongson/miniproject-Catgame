@@ -17,6 +17,7 @@ public class GameState {
     private final java.util.HashMap<String, Integer> inventory = new java.util.HashMap<>();
     private final java.util.HashMap<String, Long> lastRewardTimes = new java.util.HashMap<>();
     private static final long COOLDOWN_MS = 30000;
+
     private static class UserQuestData {
         int feedCount = 0;
         int playCount = 0;
@@ -25,7 +26,13 @@ public class GameState {
         boolean feedClaimed = false;
         boolean playClaimed = false;
         boolean shopClaimed = false;
-    }  
+
+        // เวลาที่กด Claim ล่าสุด (ใช้คำนวณ cooldown)
+        long feedClaimTime = 0;
+        long playClaimTime = 0;
+        long shopClaimTime = 0;
+    }
+
     private static final String FILE_PATH = "./File/users.csv";
     private final HashMap<String, UserQuestData> userQuests = new HashMap<>();
     private String currentUsername = null;
@@ -83,13 +90,13 @@ public class GameState {
 
     public boolean useItem(String itemKey) {
         int current = getItemCount(itemKey);
-        if (current <= 0) return false;      
+        if (current <= 0) return false;
         inventory.put(itemKey, current - 1);
         fireChanged();
-    return true;
+        return true;
     }
 
-    // กลับเป็นค่าเริ่มต้น 
+    // กลับเป็นค่าเริ่มต้น
     public void reset() {
         coin = 50;
         energy = 60;
@@ -148,7 +155,7 @@ public class GameState {
 
     private UserQuestData getQuestData() {
         String key = (currentUsername == null || currentUsername.trim().isEmpty()) ? "default" : currentUsername.trim();
-        
+
         UserQuestData data = userQuests.get(key);
         if (data == null) {
             data = new UserQuestData();
@@ -234,16 +241,17 @@ public class GameState {
     private static int clamp(int v) {
         return Math.max(0, Math.min(MAX, v));
     }
+
     public boolean tryClaimReward(String activityKey, int rewardCoin) {
         long now = System.currentTimeMillis();
         long lastTime = lastRewardTimes.getOrDefault(activityKey, 0L);
 
         if (now - lastTime >= COOLDOWN_MS) {
-            addCoin(rewardCoin);                  
+            addCoin(rewardCoin);
             lastRewardTimes.put(activityKey, now);
             return true;
         }
-        return false; 
+        return false;
     }
 
     /**
@@ -257,10 +265,48 @@ public class GameState {
         return (COOLDOWN_MS - diff) / 1000;
     }
 
-        public int getFeedCount() {
+    // ===================== Quest =====================
+
+    private static final long questCD = 28800000; // cooldown เควส 8 ชั่วโมง
+
+    /** เวลา cooldown ที่เหลือ (วินาที) ของเควส "feed" / "play" / "shop" ; 0 = ไม่ติด cooldown */
+    public long getQuestCDRemaining(String questKey) {
+        UserQuestData d = getQuestData();
+        boolean claimed;
+        long last;
+        switch (questKey) {
+            case "feed": claimed = d.feedClaimed; last = d.feedClaimTime; break;
+            case "play": claimed = d.playClaimed; last = d.playClaimTime; break;
+            case "shop": claimed = d.shopClaimed; last = d.shopClaimTime; break;
+            default: return 0;
+        }
+        if (!claimed) return 0;
+        long left = questCD - (System.currentTimeMillis() - last);
+        return left <= 0 ? 0 : (left + 999) / 1000;
+    }
+
+    /** ถ้าเควสไหนครบ cooldown แล้ว ให้รีเซ็ต (นับใหม่ + เคลมได้อีก) คืน true ถ้ามีการรีเซ็ต */
+    public boolean refreshQuests() {
+        UserQuestData d = getQuestData();
+        boolean changed = false;
+        if (d.feedClaimed && getQuestCDRemaining("feed") == 0) {
+            d.feedClaimed = false; d.feedCount = 0; changed = true;
+        }
+        if (d.playClaimed && getQuestCDRemaining("play") == 0) {
+            d.playClaimed = false; d.playCount = 0; changed = true;
+        }
+        if (d.shopClaimed && getQuestCDRemaining("shop") == 0) {
+            d.shopClaimed = false; d.shopBuyCount = 0; changed = true;
+        }
+        if (changed) fireChanged();
+        return changed;
+    }
+
+    public int getFeedCount() {
         return getQuestData().feedCount;
     }
     public void recordFeedCount() {
+        if (getQuestData().feedClaimed) return;   // เคลมแล้ว ไม่นับเพิ่มระหว่าง cooldown
         getQuestData().feedCount++;
         fireChanged();
     }
@@ -269,41 +315,47 @@ public class GameState {
         return getQuestData().playCount;
     }
     public void recordPlayCount() {
+        if (getQuestData().playClaimed) return;
         getQuestData().playCount++;
         fireChanged();
     }
 
-    public int getShopBuyCount() { 
+    public int getShopBuyCount() {
         return getQuestData().shopBuyCount;
     }
-    public void recordShopBuy() { 
-        recordShopBuy_internal();
-    }
-    private void recordShopBuy_internal() { 
+    public void recordShopBuy() {
+        if (getQuestData().shopClaimed) return;
         getQuestData().shopBuyCount++;
         fireChanged();
     }
 
-    public boolean doFeedClaimed(){
+    public boolean doFeedClaimed() {
         return getQuestData().feedClaimed;
     }
-    public void setFeedClaimed(boolean feedClaimed){
-        getQuestData().feedClaimed = feedClaimed;
-        fireChanged();
-    }
-    public boolean doPlayClaimed(){
-        return getQuestData().playClaimed;
-    }
-    public void setPlayClaimed(boolean playClaimed){
-        getQuestData().playClaimed = playClaimed;
+    public void setFeedClaimed(boolean v) {
+        UserQuestData d = getQuestData();
+        d.feedClaimed = v;
+        if (v) d.feedClaimTime = System.currentTimeMillis();
         fireChanged();
     }
 
-    public boolean doShopClaimed(){
+    public boolean doPlayClaimed() {
+        return getQuestData().playClaimed;
+    }
+    public void setPlayClaimed(boolean v) {
+        UserQuestData d = getQuestData();
+        d.playClaimed = v;
+        if (v) d.playClaimTime = System.currentTimeMillis();
+        fireChanged();
+    }
+
+    public boolean doShopClaimed() {
         return getQuestData().shopClaimed;
     }
-    public void setShopClaimed(boolean shopClaimed){
-        getQuestData().shopClaimed = shopClaimed;
+    public void setShopClaimed(boolean v) {
+        UserQuestData d = getQuestData();
+        d.shopClaimed = v;
+        if (v) d.shopClaimTime = System.currentTimeMillis();
         fireChanged();
     }
 }
