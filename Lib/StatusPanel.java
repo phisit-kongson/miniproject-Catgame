@@ -3,11 +3,6 @@ package Lib;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * แผงแสดง coin + หลอดสถานะ 3 หลอด วางมุมซ้ายบนของห้องไหนก็ได้ด้วย
- *     cp.add(new StatusPanel());
- * อ่านค่าจาก GameState และอัปเดตเองอัตโนมัติ
- */
 public class StatusPanel extends JPanel {
 
     private final GameState state = GameState.get();
@@ -23,7 +18,7 @@ public class StatusPanel extends JPanel {
         UIManager.put("ProgressBar.selectionBackground", Color.BLACK);
         UIManager.put("ProgressBar.selectionForeground", Color.BLACK);
 
-        // บล็อกแสดง coin
+        
         coinBox = new JLabel("", SwingConstants.CENTER);
         coinBox.setFont(new Font("", Font.BOLD, 16));
         coinBox.setBounds(15, 15, 100, 35);
@@ -33,7 +28,6 @@ public class StatusPanel extends JPanel {
         coinBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
         add(coinBox);
 
-        // หลอดพลังงาน / ความหิว / ความสะอาด
         energyBar  = makeBar(65,  new Color(36, 149, 255));
         hungerBar  = makeBar(90,  new Color(240, 129, 60));
         hygieneBar = makeBar(115, new Color(51, 222, 205));
@@ -58,7 +52,6 @@ public class StatusPanel extends JPanel {
         hygieneBar.setValue(state.getHygiene());
     }
 
-    //  เริ่มฟังเมื่อหน้าต่างถูกสร้างจริง และเลิกฟังตอน dispose() จะได้ไม่ค้างในหน่วยความจำ
     @Override
     public void addNotify() {
         super.addNotify();

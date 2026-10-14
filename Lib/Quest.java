@@ -13,6 +13,10 @@ public class Quest extends JFrame implements ActionListener {
 
     private Image questBg;
 
+    private Timer reQuestTimer;
+    private final java.util.List<Runnable> reTime = new java.util.ArrayList<>();
+    private final java.util.List<JPanel> rows = new java.util.ArrayList<>();
+
     public Quest(JFrame parentFrame) {
         this.parentFrame = parentFrame;
 
@@ -51,38 +55,23 @@ public class Quest extends JFrame implements ActionListener {
         titleLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 5));
         cp.add(titleLabel);
 
-        // เช็กเงื่อนไขความสำเร็จ
-        boolean feedDone = state.getFeedCount() >= 3;
-        boolean playDone = state.getPlayCount() >= 1;
-        boolean shopDone = state.getShopBuyCount() >= 2;
+        state.refreshQuests();     
+        buildQuestBoxes();
 
-        // 1. เควส Feed
-        createQuestBox(80, "Feed the Cat", 
-            "Feed cat (" + state.getFeedCount() + "/3)", 15, feedDone, state.doFeedClaimed(), () -> {
-                state.addCoin(15);
-                state.setFeedClaimed(true);
-            });
+        reQuestTimer = new Timer(1000, e -> {
+            if (state.refreshQuests()) {
+                buildQuestBoxes();
+            } else {
+                for (Runnable r : new java.util.ArrayList<>(reTime)) r.run();
+            }
+        });
+        reQuestTimer.start();
 
-        // 2. เควส Play
-        createQuestBox(190, "Play with Cat", 
-            "Click on cat (" + state.getPlayCount() + "/1)", 10, playDone, state.doPlayClaimed(), () -> {
-                state.addCoin(10);
-                state.setPlayClaimed(true);
-            });
-
-        //เควส Shop
-        createQuestBox(300, "Shop Food", 
-            "Buy from shop (" + state.getShopBuyCount() + "/2)", 20, shopDone, state.doShopClaimed(), () -> {
-                state.addCoin(20);
-                state.setShopClaimed(true);
-            });
-
-        backBtn = new JButton("< Back");
+        backBtn = new JButton("Back");
         backBtn.setFont(new Font("Monospaced", Font.BOLD, 18));
         backBtn.setBounds(100, 525, 200, 45);
-        backBtn.setBackground(new Color(240, 240, 240));
+        backBtn.setBackground(Color.WHITE);
         backBtn.setFocusable(false);
-        backBtn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
         backBtn.addActionListener(this);
         cp.add(backBtn);
 
@@ -91,8 +80,46 @@ public class Quest extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    // เพิ่มพารามิเตอร์ isClaimed เข้ามาเช็กสถานะ
-    private void createQuestBox(int y, String questName, String desc, int rewardCoins, boolean isCompleted, boolean isClaimed, Runnable onClaim) {
+    private void buildQuestBoxes() {
+        for (JPanel p : rows) cp.remove(p);
+        rows.clear();
+        reTime.clear();
+
+        boolean feedDone = state.getFeedCount() >= 3;
+        boolean playDone = state.getPlayCount() >= 1;
+        boolean shopDone = state.getShopBuyCount() >= 2;
+
+        createQuestBox(80, "feed", "Feed the Cat",
+            "Feed cat (" + state.getFeedCount() + "/3)", 15, feedDone, state.doFeedClaimed(), () -> {
+                state.addCoin(15);
+                state.setFeedClaimed(true);
+            });
+
+        createQuestBox(190, "play", "Play with Cat",
+            "Click on cat (" + state.getPlayCount() + "/1)", 10, playDone, state.doPlayClaimed(), () -> {
+                state.addCoin(10);
+                state.setPlayClaimed(true);
+            });
+
+        createQuestBox(300, "shop", "Shop Food",
+            "Buy from shop (" + state.getShopBuyCount() + "/2)", 20, shopDone, state.doShopClaimed(), () -> {
+                state.addCoin(20);
+                state.setShopClaimed(true);
+            });
+
+        cp.revalidate();
+        cp.repaint();
+    }
+
+    private static String formatTime(long sec) {
+        long h = sec / 3600;
+        long m = (sec % 3600) / 60;
+        long s = sec % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
+
+    private void createQuestBox(int y, String questKey, String questName, String desc,
+                                int rewardCoins, boolean isCompleted, boolean isClaimed, Runnable onClaim) {
         JPanel rowPanel = new JPanel();
         rowPanel.setLayout(null);
         rowPanel.setBounds(30, y, 340, 95);
@@ -118,25 +145,30 @@ public class Quest extends JFrame implements ActionListener {
         JButton claimBtn = new JButton();
         claimBtn.setFont(new Font("Monospaced", Font.BOLD, 14));
         claimBtn.setFocusable(false);
-        claimBtn.setBounds(230, 22, 90, 50);
+        claimBtn.setBounds(230, 18, 90, 45);
         claimBtn.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
-        // ตรวจสอบลำดับสถานะ: ถ้าเคลมแล้ว -> ถ้าทำเสร็จแล้วแต่ยังไม่เคลม -> ถ้ายังไม่เสร็จ
         if (isClaimed) {
             claimBtn.setText("Claimed");
             claimBtn.setBackground(Color.GRAY);
             claimBtn.setForeground(Color.WHITE);
             claimBtn.setEnabled(false);
+
+            JLabel cdLabel = new JLabel(formatTime(state.getQuestCDRemaining(questKey)), SwingConstants.CENTER);
+            cdLabel.setFont(new Font("Monospaced", Font.BOLD, 12));
+            cdLabel.setForeground(new Color(200, 0, 0));
+            cdLabel.setBounds(230, 66, 90, 18);
+            rowPanel.add(cdLabel);
+
+            reTime.add(() -> cdLabel.setText(formatTime(state.getQuestCDRemaining(questKey))));
         } else if (isCompleted) {
             claimBtn.setText("Claim");
             claimBtn.setBackground(Color.GREEN);
             claimBtn.setForeground(Color.WHITE);
             claimBtn.addActionListener(e -> {
-                onClaim.run(); // เรียกฟังก์ชันบวกเหรียญและตั้งค่า set...Claimed(true)
+                onClaim.run();
                 JOptionPane.showMessageDialog(this, "Claimed +" + rewardCoins + " Coins!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                claimBtn.setText("Claimed");
-                claimBtn.setEnabled(false);
-                claimBtn.setBackground(Color.GRAY);
+                buildQuestBoxes();   
             });
         } else {
             claimBtn.setText("Doing");
@@ -147,6 +179,13 @@ public class Quest extends JFrame implements ActionListener {
 
         rowPanel.add(claimBtn);
         cp.add(rowPanel);
+        rows.add(rowPanel);
+    }
+
+    @Override
+    public void dispose() {
+        if (reQuestTimer != null) reQuestTimer.stop();   
+        super.dispose();
     }
 
     @Override

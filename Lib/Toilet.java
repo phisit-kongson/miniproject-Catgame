@@ -13,13 +13,12 @@ public class Toilet extends JFrame implements ActionListener {
     private CatSprite cat;
     private JLabel hintLabel;
 
-    private static final int BATH_LEVELS = 4;   // จำนวนคลิกถูสบู่ ตามเฟรม
-    private static final int SOAP_GAIN   = 5;   // ค่าความสะอาดที่ได้จากการคลิก
-    private static final int RINSE_GAIN  = 30;  // ค่าที่ได้ตอนคลิกจบ
+    private static final int BATH_LEVELS = 4; 
+    private static final int RINSE_GAIN  = 55;
 
     private enum Bath { IDLE, SOAPING, FOAM_FULL, RINSING }
     private Bath bath = Bath.IDLE;
-    private int soapLevel = 0;                  // 0 = ยังไม่มีฟอง
+    private int soapLevel = 0;                  
 
     public Toilet(JFrame parentFrame) {
         this.parentFrame = parentFrame;
@@ -69,6 +68,7 @@ public class Toilet extends JFrame implements ActionListener {
         cat.setAnnoyedAnimation("cat-annoy", 4, 400);
         cat.setBathFrames("cat-bath", BATH_LEVELS);
         cat.setRinseAnimation("cat-rinse", 3, 400);
+        cat.setWaterAnimation("cat-water", 2, 800);
         cat.setLocation(104,210);
         cat.addMouseListener(new MouseAdapter() {
             @Override
@@ -83,14 +83,11 @@ public class Toilet extends JFrame implements ActionListener {
         setLocationRelativeTo(null);
     }
 
-    // คลิกแมว: ถูสบู่ทีละระดับ -> ฟองเต็มแล้วคลิกอีกครั้งเพื่อล้างน้ำ -> แมวดีใจ
     private void onCatClicked() {
-        if (cat.isBusy() || bath == Bath.RINSING) return;   // กำลังเล่นอนิเมชันอยู่ ไม่รับคลิกซ้อน
-
+        if (cat.isBusy() || bath == Bath.RINSING) return;   
         GameState state = GameState.get();
-
         if (bath == Bath.IDLE && state.getHygiene() >= GameState.MAX) {
-            cat.onClicked();                                // สะอาดเต็มแล้ว ไม่ต้องอาบ (แมวทำท่าตามปกติ)
+            cat.playWaterAnnoyed();                                
             hintLabel.setText("The cat is already clean.");
             return;
         }
@@ -98,7 +95,6 @@ public class Toilet extends JFrame implements ActionListener {
         if (bath == Bath.IDLE || bath == Bath.SOAPING) {    // ถูสบู่
             soapLevel++;
             cat.showBathLevel(soapLevel - 1);
-            state.addHygiene(SOAP_GAIN);
             if (soapLevel >= BATH_LEVELS) {
                 bath = Bath.FOAM_FULL;
                 hintLabel.setText("Full of bubbles! Click to rinse.");
@@ -119,7 +115,7 @@ public class Toilet extends JFrame implements ActionListener {
                 if (state.getHygiene() >= GameState.MAX) {
                     boolean gotReward = state.tryClaimReward("toilet", 20);
                     if (gotReward) {
-                        hintLabel.setText("Clean & fresh! +20 Coins ");
+                        hintLabel.setText("Clean & fresh! +20 coin (cd 30s) ");
                     } else {
                         hintLabel.setText("The kitty is cleaner now!");
                     }

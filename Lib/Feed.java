@@ -128,11 +128,11 @@ public class Feed extends JFrame implements ActionListener {
         if (cat.isBusy()) return;                 
         if (!state.useItem(itemKey)) return;      
 
-        if (state.getHunger() >= FULL_LIMIT) {    // อิ่มแล้วยังป้อน -> อ้วก
+        if (state.getHunger() >= FULL_LIMIT) {   
             cat.playVomit(() -> {
                 state.addHunger(-VOMIT_HUNGER);
             });
-        } else {                                  // ยังหิวอยู่ -> กินปกติ
+        } else {                                  
             cat.playEat(() -> state.addHunger(hungerGain));
             GameState.get().recordFeedCount();
         }
@@ -146,13 +146,13 @@ public class Feed extends JFrame implements ActionListener {
             }
             this.dispose();
         } else if (e.getSource() == milkBtn) {
-            feed("milk", 10);
+            feed("milk", 20);
         } else if (e.getSource() == fishBtn) {
-            feed("fish", 25);
+            feed("fish", 30);
         } else if (e.getSource() == kibbleBtn) {
-            feed("kibble", 35);
+            feed("kibble", 40);
         } else if (e.getSource() == snackBtn) {
-            feed("snack cat", 15);
+            feed("snack cat", 10);
         }
     }
 }
