@@ -25,6 +25,7 @@ public class CatSprite extends JLabel {
     private int eatDelay ;
     private int vomitDelay ;
     private boolean playingOnce = false;    // กดเล่นเเมว
+    private boolean annoyedNow = false;
     private boolean holding = false;      // ค้างเฟรม
     private boolean sleeping = false;      
     private Runnable onFinished;          // ทำต่อหลังรันอนิเมชันจบ
@@ -61,11 +62,14 @@ public class CatSprite extends JLabel {
         happyFrames = loadFrames(prefix, frameCount);
         happyDelay = delayMs;
 
-    }public void setAnnoyedAnimation(String prefix, int frameCount, int delayMs) {
+    }
+    public void setAnnoyedAnimation(String prefix, int frameCount, int delayMs) {
         annoyedFrames = loadFrames(prefix, frameCount);
         annoyedDelay = delayMs;
     }
-
+    public boolean isAnnoyedNow() {
+        return annoyedNow; 
+    }
     // ห้องนอน
     public void setSleepAnimation(String prefix, int frameCount, int delayMs) {
         sleepFrames = loadFrames(prefix, frameCount);
@@ -185,8 +189,10 @@ public class CatSprite extends JLabel {
 
         if (clickCount >= CLICK_LIMIT && annoyedFrames != null) {
             clickCount = 0;
+            annoyedNow = true;
             playOnce(annoyedFrames, annoyedDelay);
         } else {
+            annoyedNow = false;
             playOnce(happyFrames, happyDelay);
         }
     }

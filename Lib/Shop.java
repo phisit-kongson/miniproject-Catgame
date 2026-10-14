@@ -10,11 +10,10 @@ public class Shop extends JFrame implements ActionListener {
     private JButton backBtn;
     private JFrame parentFrame;
     private JLabel coinLabel;
+    private Image shopBg;
     private final Runnable coinRefresher = this::updateCoinDisplay;
-    
     private final GameState state = GameState.get();
-    private Image shopBg; 
-
+     
     public Shop(JFrame parentFrame) {
         this.parentFrame = parentFrame;
 

@@ -58,7 +58,6 @@ public class StatusPanel extends JPanel {
         hygieneBar.setValue(state.getHygiene());
     }
 
-    //  เริ่มฟังเมื่อหน้าต่างถูกสร้างจริง และเลิกฟังตอน dispose() จะได้ไม่ค้างในหน่วยความจำ
     @Override
     public void addNotify() {
         super.addNotify();

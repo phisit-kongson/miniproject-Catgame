@@ -1,5 +1,6 @@
 package Lib;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Timer;
@@ -14,7 +15,9 @@ public class GameState {
     private static final GameState INSTANCE = new GameState();
     private final java.util.HashMap<String, Integer> inventory = new java.util.HashMap<>();
     private final java.util.HashMap<String, Long> lastRewardTimes = new java.util.HashMap<>();
-    private static final long COOLDOWN_MS = 30000; // 30 วินาที 
+    private static final long COOLDOWN_MS = 30000;  
+    private static final String FILE_PATH = "./File/users.csv";
+    private String currentUsername = null;
 
     public static GameState get() {
         return INSTANCE;
@@ -88,13 +91,103 @@ public class GameState {
         fireChanged();
     }
 
-    
+    public void loadUser(String username) {
+        this.currentUsername = null;
+        reset();
+        lastRewardTimes.clear();
+
+        File file = new File(FILE_PATH);
+        if (file.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line = br.readLine(); // ข้าม Header
+                while ((line = br.readLine()) != null) {
+                    if (line.trim().isEmpty()) continue;
+                    String[] arr = line.split(",");
+
+                    if (arr.length > 2 && arr[1].trim().equals(username)) {
+                        if (arr.length >= 11) {
+                            try {
+                                coin    = Math.max(0, Integer.parseInt(arr[3].trim()));
+                                energy  = clamp(Integer.parseInt(arr[4].trim()));
+                                hunger  = clamp(Integer.parseInt(arr[5].trim()));
+                                hygiene = clamp(Integer.parseInt(arr[6].trim()));
+                                inventory.put("fish",      Math.max(0, Integer.parseInt(arr[7].trim())));
+                                inventory.put("milk",      Math.max(0, Integer.parseInt(arr[8].trim())));
+                                inventory.put("kibble",    Math.max(0, Integer.parseInt(arr[9].trim())));
+                                inventory.put("snack cat", Math.max(0, Integer.parseInt(arr[10].trim())));
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        break;
+                    }
+                }
+            } catch (IOException ex) {
+                System.err.println("Cannot load user data: " + ex.getMessage());
+            }
+        }
+
+        this.currentUsername = username;
+        fireChanged();
+    }
+
+    public void saveUser() {
+        if (currentUsername == null || currentUsername.isEmpty()) return;
+
+        File file = new File(FILE_PATH);
+        if (!file.exists()) return;
+
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+
+                if (isFirstLine) {
+                    lines.add(line);
+                    isFirstLine = false;
+                    continue;
+                }
+
+                String[] arr = line.split(",");
+                if (arr.length > 2 && arr[1].trim().equals(currentUsername)) {
+                    String updatedLine = arr[0].trim() + ","
+                            + arr[1].trim() + ","
+                            + arr[2].trim() + ","
+                            + coin + ","
+                            + energy + ","
+                            + hunger + ","
+                            + hygiene + ","
+                            + getItemCount("fish") + ","
+                            + getItemCount("milk") + ","
+                            + getItemCount("kibble") + ","
+                            + getItemCount("snack cat");
+                    lines.add(updatedLine);
+                } else {
+                    lines.add(line);
+                }
+            }
+        } catch (IOException ex) {
+            return;
+        }
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, false))) {
+            for (String l : lines) {
+                bw.write(l);
+                bw.newLine();
+            }
+        } catch (IOException ex) {
+            System.err.println("Cannot save user data: " + ex.getMessage());
+        }
+    }
+
     public void startDecay() {
         if (!decayTimer.isRunning()) decayTimer.start();
     }
 
     public void stopDecay() {
         decayTimer.stop();
+        saveUser();
     }
 
     public void addListener(Runnable r) {
@@ -106,6 +199,7 @@ public class GameState {
     }
 
     private void fireChanged() {
+        saveUser();
         for (Runnable r : new ArrayList<>(listeners)) r.run();
     }
 
@@ -116,13 +210,12 @@ public class GameState {
         long now = System.currentTimeMillis();
         long lastTime = lastRewardTimes.getOrDefault(activityKey, 0L);
 
-        // ถ้าเวลาปัจจุบันห่างจากรอบก่อนเกิน 30 วินาที
         if (now - lastTime >= COOLDOWN_MS) {
-            addCoin(rewardCoin);                  // บวกเหรียญและอัปเดตหน้าจออัตโนมัติ
-            lastRewardTimes.put(activityKey, now); // บันทึกเวลาที่ได้รับล่าสุด
+            addCoin(rewardCoin);                  
+            lastRewardTimes.put(activityKey, now);
             return true;
         }
-        return false; // ยังติด Cooldown ไม่แจกเหรียญ
+        return false; 
     }
 
     /**
