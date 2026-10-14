@@ -14,6 +14,7 @@ public class SignupFrame extends JFrame implements ActionListener{
     private JButton signupBtn ;
     private JButton backBtn ;
     private JFrame preFrame;
+    private Image background ;
 
     public SignupFrame(JFrame preFrame){
         this.preFrame = preFrame;
@@ -21,33 +22,51 @@ public class SignupFrame extends JFrame implements ActionListener{
         setResizable(false);
         setLayout(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(400,350);
+        setSize(400,400);
 
-        title = new JLabel("Sign Up");
+        try {
+            background = new ImageIcon(getClass().getResource("/pic/background/login_bg2.png")).getImage();
+        } catch (Exception e) {
+            background = null;
+        }
+
+        JPanel bgPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (background != null) {
+                    g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
+        bgPanel.setLayout(null);
+        setContentPane(bgPanel);
+
+        title = new JLabel("Sign up");
         title.setBounds(150,30,140,40);
         title.setFont(new Font("Tahoma", Font.BOLD, 30));
         add(title);
 
         text1 = new JLabel("username : ");
-        text1.setBounds(47, 110, 100, 30);
+        text1.setBounds(47, 100, 100, 30);
         text1.setFont(new Font("Tahoma", Font.BOLD, 16));
         add(text1);
 
         username = new JTextField();
-        username.setBounds(160, 110, 180, 30);
+        username.setBounds(160, 100, 180, 30);
         add(username);
 
         text2 = new JLabel("password : ");
-        text2.setBounds(50, 160, 100, 30);
+        text2.setBounds(50, 175, 100, 30);
         text2.setFont(new Font("Tahoma", Font.BOLD, 16));
         add(text2);
 
         password = new JPasswordField();
-        password.setBounds(160, 160, 180, 30);
+        password.setBounds(160, 175, 180, 30);
         add(password);
 
         signupBtn = new JButton("Sign up");
-        signupBtn.setBounds(135, 220, 130, 40);
+        signupBtn.setBounds(135, 250, 130, 40);
         signupBtn.setFocusable(false);
         add(signupBtn);
         signupBtn.addActionListener(this);
