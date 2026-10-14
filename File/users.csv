@@ -1,5 +1,2 @@
-id,username,password
-1,qq,111
-2,catblack,123456
-3,fert,56789
-4,nancy,77777
+id,username,password,coin,energy,hunger,hygiene,fish,milk,kibble,snack cat
+1,cat1,12345678,50,58,57,48,0,0,0,0
