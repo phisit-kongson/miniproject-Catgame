@@ -1,5 +1,5 @@
-id,username,password
-1,qq,111
-2,catblack,123456
-3,fert,56789
-4,nancy,77777
+id,username,password,coin,energy,hunger,hygiene,fish,milk,kibble,snack cat
+1,qq,111,37,0,0,0,3,1,1,1
+2,catblack,123456,50,0,0,0,0,0,0,0
+3,Wachi,kaoz99999,52,0,0,0,0,0,1,0
+4,Nigga,nigga5652,78,0,0,0,0,0,0,0

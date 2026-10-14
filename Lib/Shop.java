@@ -10,11 +10,10 @@ public class Shop extends JFrame implements ActionListener {
     private JButton backBtn;
     private JFrame parentFrame;
     private JLabel coinLabel;
+    private Image shopBg;
     private final Runnable coinRefresher = this::updateCoinDisplay;
-    
     private final GameState state = GameState.get();
-    private Image shopBg; 
-
+     
     public Shop(JFrame parentFrame) {
         this.parentFrame = parentFrame;
 
@@ -138,7 +137,7 @@ public class Shop extends JFrame implements ActionListener {
         buyBtn.addActionListener(e -> {
             if (state.trySpend(price)) {
                 state.addItem(itemKey, 1); // เพิ่มไอเทมเข้ากระเป๋า
-                GameState.get().recordShopBuy();//ตัวนับเควส ว่ามีของเข้ากะเป๋าไหม
+                GameState.get().recordShopBuy();
             } else {
                 JOptionPane.showMessageDialog(this, "Not enough coins!", "Warning", JOptionPane.WARNING_MESSAGE);
             }

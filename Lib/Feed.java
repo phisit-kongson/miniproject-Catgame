@@ -128,11 +128,11 @@ public class Feed extends JFrame implements ActionListener {
         if (cat.isBusy()) return;                 
         if (!state.useItem(itemKey)) return;      
 
-        if (state.getHunger() >= FULL_LIMIT) {    // อิ่มแล้วยังป้อน -> อ้วก
+        if (state.getHunger() >= FULL_LIMIT) {    // อิ่มแล้วยังป้อน  อ้วก
             cat.playVomit(() -> {
                 state.addHunger(-VOMIT_HUNGER);
             });
-        } else {                                  // ยังหิวอยู่ -> กินปกติ
+        } else {                                  
             cat.playEat(() -> state.addHunger(hungerGain));
             GameState.get().recordFeedCount();
         }
