@@ -62,10 +62,10 @@ public class Shop extends JFrame implements ActionListener {
 
         state.addListener(coinRefresher);
         //  รายการสินค้าแต่ละแถว 
-        createItemRow(80, "Fish", "6 Coins", "fish", 6, "/pic/icon/fish.png", 20);
-        createItemRow(190, "Cat Milk", "3 Coins", "milk", 3, "/pic/icon/milk.png", 10);
-        createItemRow(300, "Kibble", "8 Coins", "kibble", 8, "/pic/icon/kibble.png", 30);
-        createItemRow(410, "Snack cat", "4 Coins", "snack cat", 4, "/pic/icon/snackcat.png", 15);
+        createItemRow(80, "Fish", "6 Coins", "fish", 6, "/pic/icon/fish.png", 30);
+        createItemRow(190, "Cat Milk", "4 Coins", "milk", 4, "/pic/icon/milk.png", 20);
+        createItemRow(300, "Kibble", "8 Coins", "kibble", 8, "/pic/icon/kibble.png", 40);
+        createItemRow(410, "Snack cat", "2 Coins", "snack cat", 2, "/pic/icon/snackcat.png", 10);
 
         //  ปุ่มย้อนกลับ (Back)
         backBtn = new JButton("back");

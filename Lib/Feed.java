@@ -146,13 +146,13 @@ public class Feed extends JFrame implements ActionListener {
             }
             this.dispose();
         } else if (e.getSource() == milkBtn) {
-            feed("milk", 10);
+            feed("milk", 20);
         } else if (e.getSource() == fishBtn) {
-            feed("fish", 25);
+            feed("fish", 30);
         } else if (e.getSource() == kibbleBtn) {
-            feed("kibble", 35);
+            feed("kibble", 40);
         } else if (e.getSource() == snackBtn) {
-            feed("snack cat", 15);
+            feed("snack cat", 10);
         }
     }
 }
