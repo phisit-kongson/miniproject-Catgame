@@ -27,7 +27,8 @@ public class PreGame extends JPanel {
         signupBtn = new JButton("Sign up");
         signupBtn.setBounds(85, 490, 220, 50);
         signupBtn.setFocusable(false);
-        signupBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 35));
+        signupBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 32));
+        signupBtn.setBackground(Color.WHITE);
         signupBtn.setForeground(Color.black);
         signupBtn.addActionListener(e -> {
         JFrame preFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -40,7 +41,8 @@ public class PreGame extends JPanel {
         loginBtn = new JButton("Login");
         loginBtn.setBounds(85, 400, 220, 50);
         loginBtn.setFocusable(false);
-        loginBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 35));
+        loginBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 32));
+        loginBtn.setBackground(Color.WHITE);
         loginBtn.setForeground(Color.black);
         loginBtn.addActionListener(e -> {
         JFrame preFrame = (JFrame) SwingUtilities.getWindowAncestor(this);

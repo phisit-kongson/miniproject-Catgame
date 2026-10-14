@@ -3,24 +3,22 @@ import java.awt.*;
 import java.awt.event.*;
 import Lib.*;
 
-
-public class GameFrame extends JFrame implements ActionListener{
+public class GameFrame extends JFrame implements ActionListener {
     
     private Container cp;
-    private JButton shopbtn, feedbtn, sleepbtn, toiletbtn, lobbybtn,questbtn;
-    private Image background; 
+    private JButton shopbtn, feedbtn, sleepbtn, toiletbtn, lobbybtn, questbtn;
+    private Image background;
+    private JLabel hintLabel;
     private CatSprite cat;
+    private final Runnable statusListener = this::updateHintByStatus;
     
     public GameFrame() {
-        
         initBackground();
         setComponent();
         Finally();
-           
     }
     
-    public void initBackground(){
-       
+    public void initBackground() {
         try {
             background = new ImageIcon(getClass().getResource("/pic/room/room_morning.png")).getImage();
         } catch (Exception e) {
@@ -31,7 +29,6 @@ public class GameFrame extends JFrame implements ActionListener{
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (background != null) {
-                
                     g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
                 }
             }
@@ -42,106 +39,131 @@ public class GameFrame extends JFrame implements ActionListener{
         cp = this.getContentPane();
     }
 
-    public void setComponent(){
+    public void setComponent() {
         int wbtn = 70;
         int hbtn = 50;
 
-        //ปุ่ม Quest
-        JButton questbtn = new JButton("Quest");
+        // ปุ่ม Quest
+        questbtn = new JButton("Quest");
         questbtn.setBounds(120, 15, 70, 35); 
         questbtn.setFocusable(false);
+        questbtn.setBackground(Color.WHITE);
         questbtn.addActionListener(e -> {
         Quest questWindow = new Quest(this);
         questWindow.setVisible(true);
         this.setVisible(false);
-    });
-    cp.add(questbtn);
+        });
+        cp.add(questbtn);
         
-        //ปุ่ม shop
-        ImageIcon shopIcon = null;
+        // ปุ่ม shop
         Image imgshop = new ImageIcon(getClass().getResource("/pic/icon/shop.png")).getImage();
         Image scaledImg = imgshop.getScaledInstance(45, 45, Image.SCALE_SMOOTH);
-        shopIcon = new ImageIcon(scaledImg);
-        shopbtn = new JButton();
-        shopbtn.setIcon(shopIcon);
+        shopbtn = new JButton(new ImageIcon(scaledImg));
         shopbtn.setBounds(20, 500, wbtn, hbtn);
         shopbtn.setFocusable(false);
         shopbtn.setBackground(Color.WHITE);
         shopbtn.addActionListener(this);
         cp.add(shopbtn);
 
-        //ปุ่ม ให้อาหาร
-        ImageIcon feedIcon = null;
+        // ปุ่ม ให้อาหาร
         Image imgfeed = new ImageIcon(getClass().getResource("/pic/icon/feed.png")).getImage();
         Image feedImg = imgfeed.getScaledInstance(65, 65, Image.SCALE_SMOOTH);
-        feedIcon = new ImageIcon(feedImg);
-        feedbtn = new JButton();
-        feedbtn.setIcon(feedIcon);
+        feedbtn = new JButton(new ImageIcon(feedImg));
         feedbtn.setBounds(120, 500, wbtn, hbtn);
         feedbtn.setFocusable(false);
         feedbtn.setBackground(Color.WHITE);
         feedbtn.addActionListener(this);
         cp.add(feedbtn);
 
-        //ปุ่ม นอน
-        ImageIcon sleepIcon = null;
+        // ปุ่ม นอน
         Image imgsleep = new ImageIcon(getClass().getResource("/pic/icon/moons.png")).getImage();
         Image sleepImg = imgsleep.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        sleepIcon = new ImageIcon(sleepImg);
-        sleepbtn = new JButton();
-        sleepbtn.setIcon(sleepIcon);
+        sleepbtn = new JButton(new ImageIcon(sleepImg));
         sleepbtn.setBounds(220, 500, wbtn, hbtn);
         sleepbtn.setFocusable(false);
         sleepbtn.setBackground(Color.WHITE);
         sleepbtn.addActionListener(this);
         cp.add(sleepbtn);
 
-        //ปุ่ม ห้องน้ำ
-        ImageIcon toiletIcon = null;
+        // ปุ่ม ห้องน้ำ
         Image imgtoilet = new ImageIcon(getClass().getResource("/pic/icon/toilet.png")).getImage();
         Image toiletImg = imgtoilet.getScaledInstance(65, 65, Image.SCALE_SMOOTH);
-        toiletIcon = new ImageIcon(toiletImg);
-        toiletbtn = new JButton();
-        toiletbtn.setIcon(toiletIcon);
+        toiletbtn = new JButton(new ImageIcon(toiletImg));
         toiletbtn.setBounds(320, 500, wbtn, hbtn);
         toiletbtn.setFocusable(false);
         toiletbtn.setBackground(Color.WHITE);
         toiletbtn.addActionListener(this);
         cp.add(toiletbtn);
 
-        //ปุ่ม กลับล็อบบี้
-        ImageIcon lobbyIcon = null;
+        // ปุ่ม กลับล็อบบี้
         Image imglobby = new ImageIcon(getClass().getResource("/pic/icon/home.png")).getImage();
         Image lobbyImg = imglobby.getScaledInstance(66, 65, Image.SCALE_SMOOTH);
-        lobbyIcon = new ImageIcon(lobbyImg);
-        lobbybtn = new JButton();
-        lobbybtn.setIcon(lobbyIcon);
+        lobbybtn = new JButton(new ImageIcon(lobbyImg));
         lobbybtn.setBounds(320, 5, wbtn, hbtn);
         lobbybtn.setFocusable(false);
         lobbybtn.setBackground(Color.WHITE);
         lobbybtn.addActionListener(this);
         cp.add(lobbybtn);
 
+        hintLabel = new JLabel("Meow Meow", SwingConstants.CENTER);
+        hintLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
+        hintLabel.setBounds(60, 450, 280, 32);
+        hintLabel.setOpaque(true);
+        hintLabel.setBackground(Color.WHITE);
+        hintLabel.setForeground(Color.BLACK);
+        hintLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+        cp.add(hintLabel);
+
         cp.add(new StatusPanel());
 
         cat = new CatSprite("cat", 6, 192, 200);
         cat.setHappyAnimation("cat-happy", 3, 425);
         cat.setAnnoyedAnimation("cat-annoy", 4, 400);
-        cat.setLocation((400 - 192) / 2, (600 - 192) / 2);
+        cat.setLocation(104, 210);
         cat.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            cat.onClicked();
-            GameState.get().recordPlayCount();
-        }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (cat.isBusy()) return;
+
+                cat.onClicked();
+                GameState.get().recordPlayCount();
+
+                hintLabel.setForeground(Color.BLACK);
+                if(cat.isAnnoyedNow()) {
+                    hintLabel.setText("Annoyed!!!!");
+                }else{
+                    hintLabel.setText("Happy! Meow~");
+                }
+                Timer resetHintTimer = new Timer(1300, evt -> updateHintByStatus());
+                resetHintTimer.setRepeats(false);
+                resetHintTimer.start();
+            }
         });
 
         cp.add(cat);
         cat.start();
         GameState.get().startDecay();
+
+        GameState.get().addListener(statusListener);
+        updateHintByStatus();
     }
 
-    public void Finally(){
+    private void updateHintByStatus() {
+        if (hintLabel == null || (cat != null && cat.isBusy())) return;
+
+        GameState state = GameState.get();
+        if (state.getHunger() < 20) {
+            hintLabel.setText("Very Hungry! Feed me please!");
+        } else if (state.getEnergy() < 20) {
+            hintLabel.setText("Very Sleepy... Need some rest!");
+        } else if (state.getHygiene() < 20) {
+            hintLabel.setText("So Dirty! Take me to the bath!");
+        } else {
+            hintLabel.setText("Meow Meow");
+        }
+    }
+
+    public void Finally() {
         setTitle("My Little Cat");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
@@ -158,22 +180,23 @@ public class GameFrame extends JFrame implements ActionListener{
             shopWindow.setVisible(true);
             this.setVisible(false);
             
-        }else if (e.getSource() == feedbtn) {
+        } else if (e.getSource() == feedbtn) {
             Feed feedroom = new Feed(this);
             feedroom.setVisible(true);
             this.setVisible(false);
 
-        }else if (e.getSource() == sleepbtn) {
+        } else if (e.getSource() == sleepbtn) {
             Sleep bedroom = new Sleep(this);
             bedroom.setVisible(true);
             this.setVisible(false);
 
-        }else if (e.getSource() == toiletbtn) {
+        } else if (e.getSource() == toiletbtn) {
             Toilet toiletroom = new Toilet(this);
             toiletroom.setVisible(true);
             this.setVisible(false);
 
-        }else if (e.getSource() == lobbybtn) {
+        } else if (e.getSource() == lobbybtn) {
+            GameState.get().removeListener(statusListener);
             GameState.get().stopDecay();
             if (cat != null) {
                 cat.stop();
@@ -183,10 +206,4 @@ public class GameFrame extends JFrame implements ActionListener{
         }
     }
     
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new GameFrame();
-        });
-    }
-
 }

@@ -9,6 +9,8 @@ public class SignupFrame extends JFrame implements ActionListener{
     private JLabel text1 ;
     private JLabel text2 ;
     private JLabel title ;
+    private JLabel userHint;
+    private JLabel passHint;
     private JTextField username ;
     private JPasswordField password ;
     private JButton signupBtn ;
@@ -48,32 +50,43 @@ public class SignupFrame extends JFrame implements ActionListener{
         add(title);
 
         text1 = new JLabel("username : ");
-        text1.setBounds(47, 100, 100, 30);
+        text1.setBounds(47, 90, 100, 30);
         text1.setFont(new Font("Tahoma", Font.BOLD, 16));
         add(text1);
 
         username = new JTextField();
-        username.setBounds(160, 100, 180, 30);
+        username.setBounds(160, 90, 180, 30);
         add(username);
 
+        userHint = new JLabel("*4-12 characters, no spaces and no comma(,)");
+        userHint.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        userHint.setForeground(Color.GRAY);
+        userHint.setBounds(160, 122, 300, 18);
+        add(userHint);
+
         text2 = new JLabel("password : ");
-        text2.setBounds(50, 175, 100, 30);
+        text2.setBounds(50, 155, 100, 30);
         text2.setFont(new Font("Tahoma", Font.BOLD, 16));
         add(text2);
 
         password = new JPasswordField();
-        password.setBounds(160, 175, 180, 30);
+        password.setBounds(160, 155, 180, 30);
         add(password);
 
+        passHint = new JLabel("*8-12 characters, no spaces and no comma(,)");
+        passHint.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        passHint.setForeground(Color.GRAY);
+        passHint.setBounds(160, 187, 300, 18);
+        add(passHint);
+
         signupBtn = new JButton("Sign up");
-        signupBtn.setBounds(135, 250, 130, 40);
+        signupBtn.setBounds(135, 245, 130, 40);
         signupBtn.setFocusable(false);
         add(signupBtn);
         signupBtn.addActionListener(this);
 
         backBtn = new JButton("back");
-        //backBtn.setBounds(135,260,130,40);
-        backBtn.setBounds(0,0,40,40);
+        backBtn.setBounds(135, 300, 130, 40);
         backBtn.setFocusable(false);
         add(backBtn);
         backBtn.addActionListener(e -> {
@@ -92,17 +105,26 @@ public class SignupFrame extends JFrame implements ActionListener{
         String usernameIn = username.getText().trim();
         String passwordIn = new String(password.getPassword()).trim();
 
-        if (usernameIn.isEmpty() || passwordIn.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all fields."
-            , "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (usernameIn.contains(",") || passwordIn.contains(",")) {
-            JOptionPane.showMessageDialog(this, "Username and password cannot contain commas (,))"
-            , "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    if (usernameIn.isEmpty() || passwordIn.isEmpty()) {
+        showPopup("Please fill in all fields.", "Warning");
+        return;
+    }
+    if (usernameIn.contains(",") || passwordIn.contains(",")) {
+        showPopup("Username and password cannot contain commas (,)", "Warning");
+        return;
+    }
+    if (usernameIn.length() < 4 || usernameIn.length() > 12) {
+        showPopup("Username must be between 4 and 12 characters.", "Warning");
+        return;
+    }
+    if (usernameIn.contains(" ") || passwordIn.contains(" ")) {
+        showPopup("Username and password cannot contain spaces.", "Warning");
+        return;
+    }
+    if (passwordIn.length() < 8 || passwordIn.length() > 12) {
+        showPopup("Password must be at least 8-12 characters.", "Warning");
+        return;
+    }
 
         String filePath = "./File/users.csv";
         File file = new File(filePath);
@@ -115,15 +137,14 @@ public class SignupFrame extends JFrame implements ActionListener{
 
         if (file.exists()) {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                String line = br.readLine(); // ข้าม Header แถวแรก
+                String line = br.readLine(); 
 
                 while ((line = br.readLine()) != null) {
                     if (line.trim().isEmpty()) continue;
                     String[] arr = line.split(",");
 
                     if (arr.length > 1 && arr[1].trim().equals(usernameIn)) {
-                        JOptionPane.showMessageDialog(this, "This username is already taken!"
-                        , "Error", JOptionPane.ERROR_MESSAGE);
+                        showPopup("This username is already taken!", "Warning");
                         return;
                     }
 
@@ -155,24 +176,43 @@ public class SignupFrame extends JFrame implements ActionListener{
         String newUserRecord = nextId + "," + usernameIn + "," + passwordIn ;
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-            if (needNewLine) {
-                bw.newLine();
-            }
+            if (needNewLine) bw.newLine();
             bw.write(newUserRecord);
-            bw.newLine(); 
-
-            JOptionPane.showMessageDialog(this, "Sign up successful!", "Success"
-            , JOptionPane.INFORMATION_MESSAGE);
-
-            if (preFrame != null) {
-                preFrame.setVisible(true);
-            }
+            bw.newLine();
+            showPopup("Sign up successful!", "Success");
+            if (preFrame != null) preFrame.setVisible(true);
             dispose();
-
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Cannot write to users.csv: " 
-            + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showPopup("Cannot write to users.csv: " + ex.getMessage(), "Error");
         }
+        
+    }
+
+    private void showPopup(String message, String title) {
+        JDialog dialog = new JDialog(this, title, true); 
+        dialog.setLayout(new BorderLayout());
+
+        JLabel msg = new JLabel(message, SwingConstants.CENTER);
+        msg.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        msg.setBorder(BorderFactory.createEmptyBorder(20, 25, 10, 25));
+
+        JButton okBtn = new JButton("OK");
+        okBtn.setFocusable(false);
+        okBtn.addActionListener(e -> dialog.dispose());
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.add(okBtn);
+
+        dialog.add(msg, BorderLayout.CENTER);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+        dialog.getRootPane().setDefaultButton(okBtn); 
+
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.pack();
+        dialog.setMinimumSize(new Dimension(280, 130));
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
 }
