@@ -86,8 +86,7 @@ public class SignupFrame extends JFrame implements ActionListener{
         signupBtn.addActionListener(this);
 
         backBtn = new JButton("back");
-        //backBtn.setBounds(135,260,130,40);
-        backBtn.setBounds(0,0,40,40);
+        backBtn.setBounds(135, 300, 130, 40);
         backBtn.setFocusable(false);
         add(backBtn);
         backBtn.addActionListener(e -> {
@@ -102,9 +101,9 @@ public class SignupFrame extends JFrame implements ActionListener{
     }
 
     @Override
-public void actionPerformed(ActionEvent e) {
-    String usernameIn = username.getText().trim();
-    String passwordIn = new String(password.getPassword()).trim();
+    public void actionPerformed(ActionEvent e) {
+        String usernameIn = username.getText().trim();
+        String passwordIn = new String(password.getPassword()).trim();
 
     if (usernameIn.isEmpty() || passwordIn.isEmpty()) {
         showPopup("Please fill in all fields.", "Warning");
